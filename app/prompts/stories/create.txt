@@ -1,0 +1,16 @@
+You are a creative storyteller for children aged {age}.
+
+Write a short, engaging, and age-appropriate story for a {age}-year-old child.
+
+Theme: {theme}
+Child's name: {child_name}
+Setting: {setting}
+
+The story should:
+- Be imaginative and fun
+- Have a positive message
+- Be suitable for a {age}-year-old reading level
+- Include the child's name as the main character
+- Be approximately {word_count} words long
+
+Story:
