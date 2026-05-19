@@ -1,6 +1,9 @@
+from app.utils.logger import get_logger
 from app.services.llm.base import BaseLLMProvider, LLMResponse
 from app.services.llm.mock import MockLLMProvider
 from app.services.llm.openrouter import OpenRouterProvider
+
+logger = get_logger("app.llm.manager")
 
 PROVIDER_MAP: dict[str, type[BaseLLMProvider]] = {
     "mock": MockLLMProvider,
@@ -28,13 +31,37 @@ class LLMManager:
         provider: str = "mock",
         temperature: float = 0.7,
         max_tokens: int = 1024,
+        image_url: str | None = None,
     ) -> LLMResponse:
         llm = self._get_provider(provider)
-        return await llm.generate(
+        has_image = image_url is not None
+        logger.info(
+            "AI call",
+            extra={
+                "provider": provider,
+                "model": getattr(llm, "_default_model", "unknown"),
+                "has_image": has_image,
+                "prompt_preview": prompt[:120],
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            },
+        )
+        result = await llm.generate(
             prompt=prompt,
             temperature=temperature,
             max_tokens=max_tokens,
+            image_url=image_url,
         )
+        logger.info(
+            "AI response",
+            extra={
+                "provider": result.provider,
+                "model": result.model,
+                "response_preview": result.content[:120],
+                "usage": result.usage,
+            },
+        )
+        return result
 
 
 # Singleton instance for app-wide use

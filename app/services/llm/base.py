@@ -20,6 +20,7 @@ class BaseLLMProvider(ABC):
         prompt: str,
         temperature: float = 0.7,
         max_tokens: int = 1024,
+        image_url: str | None = None,
     ) -> LLMResponse:
-        """Send a prompt to the LLM and return the response."""
+        """Send a prompt (optionally with an image) to the LLM and return the response."""
         ...

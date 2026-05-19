@@ -22,8 +22,7 @@ config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 target_metadata = SQLModel.metadata
 
 # Import all models here so they register with SQLModel.metadata
-# (Models will be added later under app/models/)
-# from app.models import *  # noqa: F403
+from app.models import *  # noqa: F403
 
 
 def run_migrations_offline() -> None:

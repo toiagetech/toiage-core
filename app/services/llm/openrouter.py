@@ -27,6 +27,7 @@ class OpenRouterProvider(BaseLLMProvider):
         prompt: str,
         temperature: float = 0.7,
         max_tokens: int = 1024,
+        image_url: str | None = None,
     ) -> LLMResponse:
         if not self._api_key:
             return LLMResponse(
@@ -36,9 +37,22 @@ class OpenRouterProvider(BaseLLMProvider):
                 usage={},
             )
 
+        if image_url:
+            # Build vision message: text + image
+            content_parts = [
+                {"type": "text", "text": prompt},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": image_url},
+                },
+            ]
+            messages = [{"role": "user", "content": content_parts}]
+        else:
+            messages = [{"role": "user", "content": prompt}]
+
         payload = {
             "model": self._default_model,
-            "messages": [{"role": "user", "content": prompt}],
+            "messages": messages,
             "temperature": temperature,
             "max_tokens": max_tokens,
         }

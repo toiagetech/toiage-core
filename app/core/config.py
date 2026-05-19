@@ -1,6 +1,9 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+from pathlib import Path
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -15,6 +18,11 @@ class Settings(BaseSettings):
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
     LLM_DEFAULT_MODEL: str = "google/gemini-2.0-flash-001"
     LLM_TIMEOUT_SECONDS: int = 30
+    UPLOAD_DIR: str = str(Path(__file__).resolve().parent.parent.parent / "uploads")
+    MAX_UPLOAD_SIZE_MB: int = 10
+    LOG_LEVEL: str = "INFO"
+    POSTHOG_API_KEY: str = ""
+    POSTHOG_HOST: str = "https://us.i.posthog.com"
 
 
 settings = Settings()
