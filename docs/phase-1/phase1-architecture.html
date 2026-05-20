@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toiage Core — Phase 1 Architecture</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 1.05rem;
+      color: #64748b;
+      margin-bottom: 32px;
+    }
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin-top: 40px;
+      margin-bottom: 16px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #334155;
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 700px) { .feature-grid { grid-template-columns: 1fr; } }
+    .feature-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      padding: 20px;
+      border-left: 4px solid #3b82f6;
+    }
+    .feature-card .num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #3b82f6;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .feature-card h4 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; color: #0f172a; }
+    .feature-card p { font-size: 0.9rem; color: #475569; }
+    .feature-card .endpoints { margin-top: 10px; font-size: 0.82rem; color: #64748b; }
+    .feature-card .endpoints code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #f1f5f9;
+      font-weight: 600;
+      color: #334155;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .badge {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-right: 4px;
+    }
+    .badge.blue { background: #dbeafe; color: #1e40af; }
+    .badge.purple { background: #f3e8ff; color: #6b21a8; }
+    .badge.amber { background: #fef3c7; color: #92400e; }
+    .arch-diagram {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.8;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .arch-diagram .hl { color: #38bdf8; }
+    .arch-diagram .hl2 { color: #a78bfa; }
+    .arch-diagram .hl3 { color: #34d399; }
+    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; font-size: 0.85rem; color: #94a3b8; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Toiage Core</h1>
+  <p class="subtitle">Phase 1 — Backend Architecture Overview</p>
+
+  <!-- Goal -->
+  <div class="card">
+    <h2>Goal</h2>
+    <p>Build a modular AI-powered backend that generates stories, hands-on activities, and positive reflections on children's artwork — designed for frontend integration and future recommendation systems.</p>
+  </div>
+
+  <!-- 6 Core Features -->
+  <h2>6 Core Features</h2>
+  <div class="feature-grid">
+
+    <div class="feature-card">
+      <div class="num">Feature 1</div>
+      <h4>Prompt Loading System</h4>
+      <p>Externalize all AI prompts so they can be versioned, edited, and reused without touching service code.</p>
+      <div class="endpoints">
+        <code>POST /ai/test-template</code>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="num">Feature 2</div>
+      <h4>Story Generation & Storage</h4>
+      <p>Generate children's stories and save them with metadata (<code>age_group</code>, <code>theme</code>, <code>skills</code>, <code>difficulty</code>) for future recommendations.</p>
+      <div class="endpoints">
+        <code>POST /stories</code> · <code>GET /stories</code> · <code>GET /stories/{id}</code>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="num">Feature 3</div>
+      <h4>Activity Generation</h4>
+      <p>Turn any story into a hands-on real-world activity. Supports <strong>household mode</strong> (common items) and <strong>toy-kit mode</strong>.</p>
+      <div class="endpoints">
+        <code>POST /activities/generate</code> · <code>GET /activities</code> · <code>GET /activities/{id}</code>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="num">Feature 4</div>
+      <h4>Image Upload</h4>
+      <p>Upload children's artwork with file validation (jpeg/png/webp/gif, max 10MB). UUID-based local storage.</p>
+      <div class="endpoints">
+        <code>POST /uploads/image</code> · <code>GET /uploads/files/{name}</code>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="num">Feature 5</div>
+      <h4>AI Image Reflection</h4>
+      <p>Give children positive, encouraging AI feedback on artwork — always warm, never judgmental. Vision-capable model support.</p>
+      <div class="endpoints">
+        <code>POST /uploads/{id}/reflect</code>
+      </div>
+    </div>
+
+    <div class="feature-card">
+      <div class="num">Feature 6</div>
+      <h4>Production Foundation</h4>
+      <p>Structured JSON logging, centralized error handling, PostHog analytics (with log fallback), Alembic migrations, clean startup.</p>
+      <div class="endpoints">
+        <code>GET /health</code> · <code>GET /db-health</code>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Architecture Diagram -->
+  <h2>Architecture</h2>
+  <div class="arch-diagram">┌─────────────┐     ┌──────────────┐     ┌──────────────────────┐
+│   <span class="hl">Client</span>      │────▶│   <span class="hl">FastAPI</span>    │────▶│   <span class="hl2">LLM Provider</span>       │
+│  (Frontend)  │     │  (REST API)  │     │  Mock / OpenRouter  │
+└─────────────┘     └──────┬───────┘     └──────────────────────┘
+                           │
+                    ┌──────┴──────┐
+                    │   <span class="hl3">Service</span>    │
+                    │    Layer     │
+                    ├─────────────┤
+                    │  <span class="hl3">Prompts</span>    │── External .txt files
+                    │  (Loader)   │
+                    ├─────────────┤
+                    │  <span class="hl3">Analytics</span>  │── PostHog / log fallback
+                    ├─────────────┤
+                    │  <span class="hl3">Uploads</span>    │── Local file system
+                    └──────┬──────┘
+                           │
+                    ┌──────┴──────┐
+                    │  <span class="hl">PostgreSQL</span> │
+                    │  (SQLModel)  │
+                    ├─────────────┤
+                    │  stories    │
+                    │  activities │
+                    │  uploads    │
+                    └─────────────┘</div>
+
+  <!-- 13 API Endpoints -->
+  <h2>13 API Endpoints</h2>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table>
+      <thead>
+        <tr><th>Method</th><th>Path</th><th>Input</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="badge">GET</span></td><td><code>/health</code></td><td>—</td><td>API health check</td></tr>
+        <tr><td><span class="badge">GET</span></td><td><code>/db-health</code></td><td>—</td><td>Database connectivity</td></tr>
+        <tr><td><span class="badge blue">POST</span></td><td><code>/ai/test</code></td><td>prompt, provider</td><td>Raw LLM test</td></tr>
+        <tr><td><span class="badge blue">POST</span></td><td><code>/ai/test-template</code></td><td>category, name, vars</td><td>Template LLM test</td></tr>
+        <tr><td><span class="badge blue">POST</span></td><td><code>/stories</code></td><td>content, age_group, theme</td><td>Save a story</td></tr>
+        <tr><td><span class="badge">GET</span></td><td><code>/stories</code></td><td>—</td><td>List stories</td></tr>
+        <tr><td><span class="badge">GET</span></td><td><code>/stories/{id}</code></td><td>—</td><td>Get story by ID</td></tr>
+        <tr><td><span class="badge blue">POST</span></td><td><code>/activities/generate</code></td><td>story_id/text, age, mode</td><td>Generate activity</td></tr>
+        <tr><td><span class="badge">GET</span></td><td><code>/activities</code></td><td>—</td><td>List activities</td></tr>
+        <tr><td><span class="badge">GET</span></td><td><code>/activities/{id}</code></td><td>—</td><td>Get activity by ID</td></tr>
+        <tr><td><span class="badge blue">POST</span></td><td><code>/uploads/image</code></td><td>file (multipart)</td><td>Upload image</td></tr>
+        <tr><td><span class="badge blue">POST</span></td><td><code>/uploads/{id}/reflect</code></td><td>—</td><td>AI reflection on image</td></tr>
+        <tr><td><span class="badge">GET</span></td><td><code>/uploads/files/{name}</code></td><td>—</td><td>Serve uploaded file</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 3 Database Tables -->
+  <h2>3 Database Tables</h2>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table>
+      <thead>
+        <tr><th>Table</th><th>Key Columns</th><th>Migration</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>stories</code></td>
+          <td>content, age_group, theme, skills, difficulty</td>
+          <td><span class="badge purple">e45d157ca814</span></td>
+          <td>Generated story storage</td>
+        </tr>
+        <tr>
+          <td><code>activities</code></td>
+          <td>story_id(FK), title, materials, instructions, challenge_question, age_group, activity_mode</td>
+          <td><span class="badge purple">3981f9dcb90d</span></td>
+          <td>Generated activity storage</td>
+        </tr>
+        <tr>
+          <td><code>uploads</code></td>
+          <td>filename, original_name, file_size, mime_type, url</td>
+          <td><span class="badge purple">792aa5dd4d11</span></td>
+          <td>Uploaded image metadata</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4 Analytics Events -->
+  <h2>4 Analytics Events</h2>
+  <div class="card" style="padding:0;overflow:hidden;">
+    <table>
+      <thead>
+        <tr><th>Event</th><th>Triggered By</th><th>Properties</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>story_generated</code></td><td><code>POST /stories</code></td><td>story_id, age_group, theme, difficulty</td></tr>
+        <tr><td><code>activity_generated</code></td><td><code>POST /activities/generate</code></td><td>activity_id, story_id, age_group, activity_mode</td></tr>
+        <tr><td><code>upload_created</code></td><td><code>POST /uploads/image</code></td><td>upload_id, file_size, mime_type</td></tr>
+        <tr><td><code>reflection_generated</code></td><td><code>POST /uploads/{id}/reflect</code></td><td>upload_id, mime_type</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Project Structure -->
+  <h2>Project Structure</h2>
+  <div class="arch-diagram">toiage-core/
+├── app/
+│   ├── api/            4 route modules
+│   │   ├── llm.py          AI test endpoints
+│   │   ├── stories.py      Story CRUD
+│   │   ├── activities.py   Activity CRUD
+│   │   └── uploads.py      Upload + Image reflection
+│   ├── core/
+│   │   └── config.py       Settings (env mapping)
+│   ├── db/
+│   │   ├── session.py      Database session
+│   │   └── base.py         Model registration
+│   ├── models/
+│   │   ├── story.py        stories table
+│   │   ├── activity.py     activities table
+│   │   └── upload.py       uploads table
+│   ├── prompts/            External .txt templates
+│   │   ├── stories/create.txt
+│   │   ├── activities/generate.txt
+│   │   ├── reflections/image.txt
+│   │   └── system/default.txt
+│   ├── schemas/            Pydantic models
+│   ├── services/
+│   │   ├── activities.py   Activity generation logic
+│   │   ├── analytics.py    PostHog / log events
+│   │   ├── uploads.py      File validation & save
+│   │   └── llm/
+│   │       ├── base.py         Abstract provider
+│   │       ├── manager.py      Provider routing
+│   │       ├── mock.py         Dev mock provider
+│   │       └── openrouter.py   Production provider
+│   └── utils/
+│       ├── logger.py       Structured JSON logger
+│       └── exceptions.py   Centralized error handlers
+├── alembic/                3 migration versions
+├── uploads/                Local image storage
+├── .env.example            Full config reference
+└── README.md               Documentation</div>
+
+  <div class="footer">
+    Toiage Core — Phase 1 · Generated 20 May 2026
+  </div>
+
+</div>
+</body>
+</html>
