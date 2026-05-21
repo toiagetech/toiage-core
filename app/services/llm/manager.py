@@ -1,13 +1,16 @@
 from app.utils.logger import get_logger
 from app.services.llm.base import BaseLLMProvider, LLMResponse
+from app.services.llm.deepseek import DeepSeekProvider
 from app.services.llm.mock import MockLLMProvider
 from app.services.llm.openrouter import OpenRouterProvider
+from app.services.llm.response_cache import get_cached, set_cached
 
 logger = get_logger("app.llm.manager")
 
 PROVIDER_MAP: dict[str, type[BaseLLMProvider]] = {
     "mock": MockLLMProvider,
     "openrouter": OpenRouterProvider,
+    "deepseek": DeepSeekProvider,
 }
 
 
@@ -35,6 +38,29 @@ class LLMManager:
     ) -> LLMResponse:
         llm = self._get_provider(provider)
         has_image = image_url is not None
+
+        # --- Cache-aware mock: return cached OpenRouter response if available ---
+        if provider == "mock":
+            cached = get_cached(prompt, image_url)
+            if cached:
+                logger.info(
+                    "AI call (served from cache)",
+                    extra={
+                        "provider": "mock",
+                        "model": cached["model"],
+                        "has_image": has_image,
+                        "prompt_preview": prompt[:120],
+                        "source": "cache",
+                    },
+                )
+                return LLMResponse(
+                    content=cached["response"],
+                    provider="mock",
+                    model=f"cached:{cached['model']}",
+                    usage={},
+                )
+
+        # --- Real AI call ---
         logger.info(
             "AI call",
             extra={
@@ -52,15 +78,29 @@ class LLMManager:
             max_tokens=max_tokens,
             image_url=image_url,
         )
-        logger.info(
-            "AI response",
-            extra={
-                "provider": result.provider,
-                "model": result.model,
-                "response_preview": result.content[:120],
-                "usage": result.usage,
-            },
-        )
+
+        # --- Cache OpenRouter responses for future mock credit savings ---
+        if provider == "openrouter":
+            set_cached(prompt, result.content, result.provider, result.model, image_url)
+            logger.info(
+                "AI response (cached)",
+                extra={
+                    "provider": result.provider,
+                    "model": result.model,
+                    "response_preview": result.content[:120],
+                    "usage": result.usage,
+                },
+            )
+        else:
+            logger.info(
+                "AI response",
+                extra={
+                    "provider": result.provider,
+                    "model": result.model,
+                    "response_preview": result.content[:120],
+                    "usage": result.usage,
+                },
+            )
         return result
 
 

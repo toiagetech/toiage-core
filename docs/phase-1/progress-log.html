@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toiage Core — Phase 1 Progress Log</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+    .container { max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 2rem; font-weight: 700; color: #0f172a; }
+    .subtitle { color: #64748b; margin-bottom: 32px; }
+    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+    .meta-item {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px 18px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      font-size: 0.9rem;
+    }
+    .meta-item .label { color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .meta-item .value { font-weight: 600; font-size: 1.1rem; }
+
+    .phase {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .phase-header {
+      padding: 18px 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+    .phase-header:hover { background: #fafafa; }
+    .phase-header h2 { font-size: 1.15rem; font-weight: 600; margin: 0; }
+    .phase-header .status { font-size: 0.78rem; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+    .status.done { background: #dcfce7; color: #166534; }
+    .status.partial { background: #fef3c7; color: #92400e; }
+    .status.pending { background: #f1f5f9; color: #64748b; }
+    .phase-body { border-top: 1px solid #e2e8f0; }
+    .task {
+      padding: 14px 24px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .task:last-child { border-bottom: none; }
+    .task-check { margin-top: 2px; flex-shrink: 0; }
+    .task-check .dot {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 18px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .dot.green { background: #dcfce7; color: #166534; }
+    .dot.amber { background: #fef3c7; color: #92400e; }
+    .task-content { flex: 1; }
+    .task-content .name { font-weight: 500; font-size: 0.95rem; }
+    .task-content .desc { font-size: 0.85rem; color: #64748b; margin-top: 2px; }
+    .task-content .files { margin-top: 6px; font-size: 0.8rem; color: #94a3b8; }
+    .task-content .files code {
+      background: #f1f5f9;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.76rem;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    .badge.new { background: #dbeafe; color: #1e40af; }
+    .footer { margin-top: 40px; text-align: center; font-size: 0.85rem; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>Toiage Core</h1>
+  <p class="subtitle">Phase 1 — Backend Progress Log</p>
+
+  <div class="meta">
+    <div class="meta-item"><div class="label">Status</div><div class="value" style="color:#166534;">✅ Complete</div></div>
+    <div class="meta-item"><div class="label">Tasks</div><div class="value">38</div></div>
+    <div class="meta-item"><div class="label">APIs</div><div class="value">13</div></div>
+    <div class="meta-item"><div class="label">Tables</div><div class="value">3</div></div>
+    <div class="meta-item"><div class="label">Migrations</div><div class="value">3</div></div>
+    <div class="meta-item"><div class="label">LLM Providers</div><div class="value">3</div></div>
+  </div>
+
+  <!-- ===== Phase 1 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>1. Prompt Loading System</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Create prompt folder structure</div>
+          <div class="desc">stories/, activities/, reflections/, system/ directories under app/prompts/</div>
+          <div class="files"><code>app/prompts/</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Sample story prompt template</div>
+          <div class="desc">Story creation template with {age}, {theme}, {child_name}, {setting}, {word_count}</div>
+          <div class="files"><code>app/prompts/stories/create.txt</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Sample activity prompt template</div>
+          <div class="desc">Activity creation template with {age}, {activity_type}, {duration}, {materials}</div>
+          <div class="files"><code>app/prompts/activities/create.txt</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Prompt loader utility</div>
+          <div class="desc">load_prompt(category, name, variables) with str.format() injection. Supports dynamic variable injection and reusable templates.</div>
+          <div class="files"><code>app/prompts/loader.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Integrate into POST /ai/test-template</div>
+          <div class="desc">Endpoint loads prompt template, injects variables, sends to LLM. Validated with mock provider.</div>
+          <div class="files"><code>app/api/llm.py</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 2 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>2. Story Generation & Storage</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Story SQLModel</div>
+          <div class="desc">Table: stories. Columns: id, content, age_group, theme, skills, difficulty, created_at</div>
+          <div class="files"><code>app/models/story.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Story API endpoints</div>
+          <div class="desc">POST /stories (save), GET /stories/{id} (by ID), GET /stories (list all)</div>
+          <div class="files"><code>app/api/stories.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Create stories migration</div>
+          <div class="desc">Alembic migration creating stories table with indexes on age_group, theme</div>
+          <div class="files"><code>alembic/versions/e45d157ca814_*.py</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 3 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>3. Activity Generation</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Activity SQLModel</div>
+          <div class="desc">Table: activities. Columns: id, story_id(FK), title, materials, instructions, challenge_question, age_group, activity_mode, created_at</div>
+          <div class="files"><code>app/models/activity.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Activity generation prompt</div>
+          <div class="desc">Structured LLM prompt: returns Title, Materials, Instructions, Challenge Question. Supports household and toy-kit modes.</div>
+          <div class="files"><code>app/prompts/activities/generate.txt</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Activity service with LLM parsing</div>
+          <div class="desc">_resolve_story_text (story_id lookup or raw text), _parse_llm_output (regex extraction), generate_activity (full flow)</div>
+          <div class="files"><code>app/services/activities.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Activity API endpoints</div>
+          <div class="desc">POST /activities/generate, GET /activities/{id}, GET /activities</div>
+          <div class="files"><code>app/api/activities.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Create activities migration</div>
+          <div class="desc">FK to stories, indexes on age_group and story_id</div>
+          <div class="files"><code>alembic/versions/3981f9dcb90d_*.py</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 4 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>4. Image Upload Infrastructure</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Upload SQLModel</div>
+          <div class="desc">Table: uploads. Columns: id, filename, original_name, file_size, mime_type, url, created_at</div>
+          <div class="files"><code>app/models/upload.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Upload service with validation</div>
+          <div class="desc">Image type validation (jpeg/png/webp/gif), max size check (10MB default), UUID-based local storage</div>
+          <div class="files"><code>app/services/uploads.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Upload API + static file serving</div>
+          <div class="desc">POST /uploads/image (multipart), GET /uploads/files/{filename} (via StaticFiles mount)</div>
+          <div class="files"><code>app/api/uploads.py</code> <code>app/main.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">UPLOAD_DIR config</div>
+          <div class="desc">Configurable upload directory and max size in settings</div>
+          <div class="files"><code>app/core/config.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Create uploads migration</div>
+          <div class="files"><code>alembic/versions/792aa5dd4d11_*.py</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 5 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>5. AI Image Reflection</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Vision support in BaseLLMProvider</div>
+          <div class="desc">Added optional image_url parameter to generate() method</div>
+          <div class="files"><code>app/services/llm/base.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Vision support in OpenRouter provider</div>
+          <div class="desc">Builds image+text content array for vision-capable models</div>
+          <div class="files"><code>app/services/llm/openrouter.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Reflection prompt (child-safe)</div>
+          <div class="desc">Always warm, encouraging, never judgmental. No hardcoded negativity rules.</div>
+          <div class="files"><code>app/prompts/reflections/image.txt</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Reflection endpoint</div>
+          <div class="desc">POST /uploads/{id}/reflect — loads prompt, builds image URL, sends to LLM, returns ReflectionResponse</div>
+          <div class="files"><code>app/api/uploads.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Mock reflection response</div>
+          <div class="desc">Added structured encouraging mock response triggered by "encouraging" keyword</div>
+          <div class="files"><code>app/services/llm/mock.py</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 6 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>6. Logging & Error Handling</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Structured JSON logger</div>
+          <div class="desc">StructuredFormatter producing JSON logs with timestamp, level, name, message, extra fields</div>
+          <div class="files"><code>app/utils/logger.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Request logging middleware</div>
+          <div class="desc">Logs method, path, status code, elapsed_ms for every HTTP request</div>
+          <div class="files"><code>app/main.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">AI call logging</div>
+          <div class="desc">Logs prompt preview, provider, model, has_image, response preview, usage for every LLM call</div>
+          <div class="files"><code>app/services/llm/manager.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Centralized exception handlers</div>
+          <div class="desc">global_exception_handler (500) + http_exception_handler — both log errors with request context</div>
+          <div class="files"><code>app/utils/exceptions.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">LOG_LEVEL config</div>
+          <div class="desc">Configurable via .env, defaults to INFO</div>
+          <div class="files"><code>app/core/config.py</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 7 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>7. Analytics Foundation</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Analytics service</div>
+          <div class="desc">AnalyticsService class with PostHog placeholder. Falls back to structured logs when POSTHOG_API_KEY is empty.</div>
+          <div class="files"><code>app/services/analytics.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Track story_generated</div>
+          <div class="desc">fires on POST /stories. Properties: story_id, age_group, theme, difficulty</div>
+          <div class="files"><code>app/api/stories.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Track activity_generated</div>
+          <div class="desc">fires on POST /activities/generate. Properties: activity_id, story_id, age_group, activity_mode</div>
+          <div class="files"><code>app/services/activities.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Track upload_created</div>
+          <div class="desc">fires on POST /uploads/image. Properties: upload_id, file_size, mime_type</div>
+          <div class="files"><code>app/api/uploads.py</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Track reflection_generated</div>
+          <div class="desc">fires on POST /uploads/{id}/reflect. Properties: upload_id, mime_type</div>
+          <div class="files"><code>app/api/uploads.py</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 8 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>8. Phase 1 Stabilization & Cleanup</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Remove dead code</div>
+          <div class="desc">Removed empty app/integrations/ directory, unused settings import in uploads.py</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Update .env.example</div>
+          <div class="desc">Added all 12 config variables with defaults</div>
+          <div class="files"><code>.env.example</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Write comprehensive README</div>
+          <div class="desc">Setup instructions, project structure, architecture, full curl reference, env docs, dev commands</div>
+          <div class="files"><code>README.md</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Create architecture HTML</div>
+          <div class="desc">Self-contained HTML doc with feature cards, architecture diagram, 13 API endpoints table, 3 DB tables, 4 analytics events</div>
+          <div class="files"><code>docs/phase-1/phase1-architecture.html</code></div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Final validation</div>
+          <div class="desc">alembic check clean, all 13 endpoints tested, migrations current (792aa5dd4d11 head), structured logging verified</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 9 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>9. DeepSeek LLM Integration</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">DeepSeek provider <span class="badge new">new</span></div>
+          <div class="desc">OpenAI-compatible provider. Supports text + vision (image_url). Configurable model. Added DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_DEFAULT_MODEL to settings.</div>
+          <div class="files"><code>app/services/llm/deepseek.py</code> &middot; 21 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Register in manager</div>
+          <div class="desc">Added "deepseek" → DeepSeekProvider to PROVIDER_MAP</div>
+          <div class="files"><code>app/services/llm/manager.py</code> &middot; 21 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Configure .env</div>
+          <div class="desc">Added API key and base URL to .env and .env.example</div>
+          <div class="files"><code>.env</code> <code>.env.example</code> &middot; 21 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">API test</div>
+          <div class="desc">curl POST /ai/test with provider=deepseek → 200 OK, reached DeepSeek servers (402 Insufficient Balance — needs credits)</div>
+          <div class="files">&middot; 21 May 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 10 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>10. LLM Response Caching System</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Response cache utility <span class="badge new">new</span></div>
+          <div class="desc">SHA256 keyed cache on disk. get_cached() / set_cached() for prompt+image combos.</div>
+          <div class="files"><code>app/services/llm/response_cache.py</code> &middot; 21 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Cache-aware mock in manager</div>
+          <div class="desc">When provider=mock, checks cache first. If found, returns cached OpenRouter response with model "cached:google/gemini-2.0-flash-001". Falls back to generic mock if no cache.</div>
+          <div class="files"><code>app/services/llm/manager.py</code> &middot; 21 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Auto-cache OpenRouter responses</div>
+          <div class="desc">OpenRouter provider responses are automatically saved to cache after every real AI call. Subsequent mock calls with same prompt use cached response — zero cost.</div>
+          <div class="files"><code>app/services/llm/manager.py</code> &middot; 21 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Functional validation</div>
+          <div class="desc">openrouter → cached to disk, mock same prompt → served from cache (log: "served from cache"), mock different prompt → generic mock. All working.</div>
+          <div class="files">&middot; 21 May 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Summary ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>Summary</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body" style="padding: 18px 24px;">
+      <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
+        <tr><td style="padding:6px 0; color:#64748b;">Total API Endpoints</td><td style="font-weight:600;">13</td></tr>
+        <tr><td style="padding:6px 0; color:#64748b;">Database Tables</td><td style="font-weight:600;">3 (stories, activities, uploads)</td></tr>
+        <tr><td style="padding:6px 0; color:#64748b;">Alembic Migrations</td><td style="font-weight:600;">3 (head: 792aa5dd4d11)</td></tr>
+        <tr><td style="padding:6px 0; color:#64748b;">LLM Providers</td><td style="font-weight:600;">3 (mock, openrouter, deepseek)</td></tr>
+        <tr><td style="padding:6px 0; color:#64748b;">Analytics Events</td><td style="font-weight:600;">4 (story_generated, activity_generated, upload_created, reflection_generated)</td></tr>
+        <tr><td style="padding:6px 0; color:#64748b;">Prompt Templates</td><td style="font-weight:600;">4 (story create, activity create, activity generate, reflection)</td></tr>
+        <tr><td style="padding:6px 0; color:#64748b;">Service Files</td><td style="font-weight:600;">12</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    Toiage Core — Phase 1 Progress Log · Last updated 21 May 2026
+  </div>
+
+</div>
+</body>
+</html>

@@ -6,7 +6,7 @@ from pathlib import Path
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", ".secrets"),
         env_file_encoding="utf-8",
         case_sensitive=False,
     )
@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     POSTHOG_API_KEY: str = ""
     POSTHOG_HOST: str = "https://us.i.posthog.com"
+    DEEPSEEK_API_KEY: str = ""
+    DEEPSEEK_BASE_URL: str = "https://api.deepseek.com/v1"
+    DEEPSEEK_DEFAULT_MODEL: str = "deepseek-chat"
 
 
 settings = Settings()
