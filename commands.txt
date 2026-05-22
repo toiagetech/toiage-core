@@ -1,4 +1,69 @@
 uv sync
 uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
+# === STORIES ===
+# Create a story (save to DB)
+curl -X POST http://localhost:8000/stories \
+  -H "Content-Type: application/json" \
+  -d '{"content":"Once upon a time, a brave rabbit explored a magical forest.","age_group":"3-5","theme":"adventure","skills":"reading, courage","difficulty":"beginner"}'
 
+# Get a story by ID
+curl http://localhost:8000/stories/1
+
+# List all stories
+curl http://localhost:8000/stories
+
+# === ACTIVITIES ===
+# Generate activity from story text (mock provider)
+curl -X POST http://localhost:8000/activities/generate \
+  -H "Content-Type: application/json" \
+  -d '{"story_text":"A brave rabbit explored a cave full of crystals.","age_group":"3-5","provider":"mock"}'
+
+# Generate activity from existing story (openrouter)
+curl -X POST http://localhost:8000/activities/generate \
+  -H "Content-Type: application/json" \
+  -d '{"story_id":1,"age_group":"3-5","provider":"openrouter"}'
+
+# Get an activity by ID
+curl http://localhost:8000/activities/1
+
+# List all activities
+curl http://localhost:8000/activities
+
+# === UPLOADS ===
+# Upload an image
+curl -X POST http://localhost:8000/uploads/image \
+  -F "file=@path/to/your/image.png"
+
+# Generate AI reflection on uploaded image (mock)
+curl -X POST http://localhost:8000/uploads/1/reflect \
+  -H "Content-Type: application/json" \
+  -d '{"provider":"mock"}'
+
+# Generate AI reflection (openrouter - real AI vision)
+curl -X POST http://localhost:8000/uploads/1/reflect \
+  -H "Content-Type: application/json" \
+  -d '{"provider":"openrouter"}'
+
+# === AI ===
+# Raw prompt test (mock)
+curl -X POST http://localhost:8000/ai/test \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Write a short story about a dragon","provider":"mock"}'
+
+# Raw prompt test (openrouter)
+curl -X POST http://localhost:8000/ai/test \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Write a short story about a dragon","provider":"openrouter","max_tokens":200}'
+
+# Prompt template test (mock)
+curl -X POST http://localhost:8000/ai/test-template \
+  -H "Content-Type: application/json" \
+  -d '{"template_category":"stories","template_name":"create","variables":{"age":"5","theme":"friendship","child_name":"Aria","setting":"forest","word_count":"100"},"provider":"mock"}'
+
+# === HEALTH ===
+curl http://localhost:8000/health
+curl http://localhost:8000/db-health
+
+# === SWAGGER ===
+# Open http://localhost:8000/docs in browser

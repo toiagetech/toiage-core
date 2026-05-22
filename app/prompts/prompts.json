@@ -1,0 +1,61 @@
+{
+  "version": 2,
+  "generated_at": "2026-05-22T04:00:00+00:00",
+  "prompts": {
+    "system/default": {
+      "version": 2,
+      "active": true,
+      "category": "system",
+      "description": "Default system prompt injected before every AI call",
+      "expected_variables": ["context", "age_group"],
+      "output_format": "free-form creative text",
+      "language_flexible": true,
+      "tone": "warm_encouraging",
+      "max_tokens_recommended": 1024
+    },
+    "stories/create": {
+      "version": 2,
+      "active": true,
+      "category": "stories",
+      "description": "Generate a personalized story for a child",
+      "expected_variables": ["age", "theme", "child_name", "setting", "word_count"],
+      "output_format": "short story, 3-5 paragraphs, positive ending",
+      "language_flexible": true,
+      "tone": "warm_encouraging",
+      "max_tokens_recommended": 1024
+    },
+    "activities/create": {
+      "version": 1,
+      "active": true,
+      "category": "activities",
+      "description": "Generate a hands-on activity from a theme",
+      "expected_variables": ["age", "activity_type", "duration", "materials"],
+      "output_format": "structured: Title, Materials, Instructions, Challenge Question",
+      "language_flexible": true,
+      "tone": "warm_encouraging",
+      "max_tokens_recommended": 1024
+    },
+    "activities/generate": {
+      "version": 2,
+      "active": true,
+      "category": "activities",
+      "description": "Generate a hands-on activity from a story",
+      "expected_variables": ["age_group", "story_text", "activity_mode"],
+      "output_format": "structured: Title, Materials, Instructions, Challenge Question",
+      "language_flexible": true,
+      "tone": "warm_encouraging",
+      "max_tokens_recommended": 1024
+    },
+    "reflections/image": {
+      "version": 2,
+      "active": true,
+      "category": "reflections",
+      "description": "Generate a positive reflection on a child's artwork/image",
+      "expected_variables": [],
+      "output_format": "encouraging paragraph followed by 'Challenge Question:'",
+      "language_flexible": true,
+      "tone": "warm_encouraging",
+      "max_tokens_recommended": 512
+    }
+  }
+}

@@ -48,10 +48,10 @@ def _parse_llm_output(text: str) -> dict:
         challenge_question = cq_match.group(1).strip()
 
     return {
-        "title": title,
-        "materials": materials,
-        "instructions": instructions,
-        "challenge_question": challenge_question,
+        "title": title or "Creative Activity",
+        "materials": materials or "- Paper\n- Crayons\n- Glue\n- Scissors\n- Imagination!",
+        "instructions": instructions or "1. Gather your materials.\n2. Use your creativity!\n3. Have fun and share your creation.",
+        "challenge_question": challenge_question or "What would you create next?",
     }
 
 
@@ -69,9 +69,17 @@ async def generate_activity(
             "story_text": story_text,
             "activity_mode": body.activity_mode,
         },
+        inject_system=True,
+        age_group=body.age_group,
+        context="Generate a hands-on activity from a story",
     )
 
-    result = await llm_manager.generate(prompt=prompt, temperature=0.7, max_tokens=1024)
+    result = await llm_manager.generate(
+        prompt=prompt,
+        provider=body.provider,
+        temperature=0.7,
+        max_tokens=1024,
+    )
 
     parsed = _parse_llm_output(result.content)
 

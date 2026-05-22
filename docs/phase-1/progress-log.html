@@ -577,6 +577,340 @@
     </div>
   </div>
 
+  <!-- ===== Phase 11 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>11. Secrets Separation (API Keys → .secrets)</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Create .secrets file <span class="badge new">new</span></div>
+          <div class="desc">Dedicated file for API keys only: OPENROUTER_API_KEY, DEEPSEEK_API_KEY. Not committed to git.</div>
+          <div class="files"><code>.secrets</code> &middot; 21 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Gitignore .secrets</div>
+          <div class="desc">Added .secrets to .gitignore alongside .env.</div>
+          <div class="files"><code>.gitignore</code> &middot; 21 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Strip keys from .env</div>
+          <div class="desc">.env now contains only non-sensitive config (APP_NAME, DATABASE_URL, etc.). Removed OPENROUTER_API_KEY and DEEPSEEK_API_KEY.</div>
+          <div class="files"><code>.env</code> &middot; 21 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Dual-source config loading</div>
+          <div class="desc">Settings loads both (.env, .secrets) via env_file tuple. Keys from .secrets override defaults.</div>
+          <div class="files"><code>app/core/config.py</code> &middot; 21 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Functional validation</div>
+          <div class="desc">Server starts, POST /ai/test with openrouter returns real AI response (key loaded from .secrets).</div>
+          <div class="files">&middot; 22 May 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 12 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>12. Provider Support in Business Endpoints</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">provider field on ActivityGenerateRequest</div>
+          <div class="desc">Added provider: str = "mock" to request schema, passed to llm_manager.generate().</div>
+          <div class="files"><code>app/schemas/activity.py</code> <code>app/services/activities.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">provider on POST /uploads/{id}/reflect</div>
+          <div class="desc">Added ReflectionRequest schema with provider: str = "mock". Endpoint now accepts JSON body.</div>
+          <div class="files"><code>app/schemas/upload.py</code> <code>app/api/uploads.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Validation</div>
+          <div class="desc">Mock provider works for all three endpoints. OpenRouter accepted as provider — real AI call executed.</div>
+          <div class="files">&middot; 22 May 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 13 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>13. Observability (Request / AI / Error / Latency Logs)</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Observability middleware <span class="badge new">new</span></div>
+          <div class="desc">UUID request_id per request. Propagated via ContextVar to LLM manager. Logs: method, path, query, status, elapsed_ms, latency_bucket, user_agent, content_type. Categorized: 2xx=info, 4xx=warning, 5xx/error=error with exc_info.</div>
+          <div class="files"><code>app/utils/observability.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">AI call observability in LLM manager</div>
+          <div class="desc">Every AI call logs: request_id, provider, model, has_image, prompt_preview, prompt_tokens, temperature, max_tokens. Response logs: request_id, response_preview, elapsed_ms, latency_bucket, input_tokens, output_tokens, total_tokens, usage. Errors log: AI call failed + failure counting.</div>
+          <div class="files"><code>app/services/llm/manager.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Error handler enrichment</div>
+          <div class="desc">Global and HTTP exception handlers now include request_id. 5xx logged as error, 4xx as warning.</div>
+          <div class="files"><code>app/utils/exceptions.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Structured logger fix</div>
+          <div class="desc">Refactored StructuredFormatter to merge extra kwargs as top-level JSON fields. All extra attributes now appear at the root of each JSON log line.</div>
+          <div class="files"><code>app/utils/logger.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Mock provider model fix</div>
+          <div class="desc">Renamed _model_name → _default_model for consistency with other providers and correct log output.</div>
+          <div class="files"><code>app/services/llm/mock.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Validation</div>
+          <div class="desc">200: request_id + AI call + AI response + API request (all with latency). 404: API request 4xx (warning). OpenRouter real call: AI response (cached) with full token breakdown.</div>
+          <div class="files">&middot; 22 May 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 14 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>14. AI Safety & Validation Layer</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Safety check utility <span class="badge new">new</span></div>
+          <div class="desc">check_safety(text) validates: profanity (stem match + obfuscated), unsafe/harmful content (weapons, self-harm, violence, sexual), output length cap (10K chars). Returns safe fallback on violation. All violations logged with matched pattern.</div>
+          <div class="files"><code>app/utils/safety.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Safety integration in LLM manager</div>
+          <div class="desc">Every AI response is checked before returning. Blocked responses replaced with child-safe fallback text. Safety violations count as failures in total_failures counter. Cache skipped for unsafe content.</div>
+          <div class="files"><code>app/services/llm/manager.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Safe fallback responses</div>
+          <div class="desc">5 fallback messages (profanity, unsafe, too_long, malformed, default) — all warm, child-friendly, and encouraging.</div>
+          <div class="files"><code>app/utils/safety.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Validation (8 test cases)</div>
+          <div class="desc">fucking(stem)✅, stupid✅, bomb(unsafe)✅, normal safe text✅, too long✅, kill yourself(unsafe)✅, fun story for kids✅, obfuscated support in pattern. All pass.</div>
+          <div class="files">&middot; 22 May 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 15 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>15. Prompt Stabilization (System Prompt + Metadata)</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">System prompt with tone + safety + multilingual rules</div>
+          <div class="desc">Rich system prompt with IDENTITY, TONE RULES, OUTPUT FORMAT, SAFETY (strict), and LANGUAGES sections. Automatically prepended before every category prompt via inject_system=True.</div>
+          <div class="files"><code>app/prompts/metadata.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Prompt metadata registry</div>
+          <div class="desc">Each template has: version, active status, category, description, expected_variables, output_format, language_flexible, tone, max_tokens_recommended. Inactive prompts raise PromptInactiveError.</div>
+          <div class="files"><code>app/prompts/metadata.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Prompt manifest (prompts.json)</div>
+          <div class="desc">Self-documenting JSON manifest with all metadata, version 2. Written to disk and loadable at runtime.</div>
+          <div class="files"><code>app/prompts/prompts.json</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Loader upgrade</div>
+          <div class="desc">load_prompt() now: checks metadata/version, warns on unknown prompts, raises on inactive prompts, prepends system prompt via inject_system with context+age_group, raises MissingVariableError with prompt key.</div>
+          <div class="files"><code>app/prompts/loader.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Integration in all callers</div>
+          <div class="desc">POST /ai/test-template, /activities/generate, /uploads/{id}/reflect all call load_prompt with inject_system=True, passing age_group and context.</div>
+          <div class="files"><code>app/api/llm.py</code> <code>app/services/activities.py</code> <code>app/api/uploads.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Mock provider fix for system prompt</div>
+          <div class="desc">Mock now splits on "---" to match user-facing section only, preventing system prompt keywords from overriding the response.</div>
+          <div class="files"><code>app/services/llm/mock.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 16 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>16. API Security Foundation</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">CORS middleware <span class="badge new">new</span></div>
+          <div class="desc">Configurable allowed origins via CORS_ALLOWED_ORIGINS (env). Supports GET/POST/PUT/DELETE/PATCH/OPTIONS. 10-min preflight cache. Wildcard warning in dev.</div>
+          <div class="files"><code>app/utils/security.py</code> <code>app/core/config.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Request body size limit</div>
+          <div class="desc">MAX_REQUEST_BODY_SIZE_BYTES (default 1MB). Rejects oversized JSON payloads with 413. Logs request_id, content_length, max_allowed. Does not affect file uploads (multipart).</div>
+          <div class="files"><code>app/utils/security.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">In-memory rate limiting</div>
+          <div class="desc">Sliding window: 60 req/min + 200 req/5min per client IP. 429 with Retry-After header. Skips health/static endpoints. Uses X-Forwarded-For, X-Real-IP, or direct client IP.</div>
+          <div class="files"><code>app/utils/security.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Upload size enforcement</div>
+          <div class="desc">Existing MAX_UPLOAD_SIZE_MB config (10MB default) + request body size limit for JSON routes.</div>
+          <div class="files"><code>app/core/config.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Validation</div>
+          <div class="desc">OPTIONS returns CORS headers (access-control-allow-origin: http://localhost:3000) ✅. 2MB JSON body → 413 ✅. Normal API call → 200 ✅. File upload → 201 ✅.</div>
+          <div class="files">&middot; 22 May 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Phase 17 ===== -->
+  <div class="phase">
+    <div class="phase-header">
+      <h2>17. API Documentation Polish</h2>
+      <span class="status done">done</span>
+    </div>
+    <div class="phase-body">
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Swagger descriptions on all endpoints</div>
+          <div class="desc">Every route now has: summary, description, response_model, status_code, and responses dict with error descriptions for all known error codes (400/404/422/413/429).</div>
+          <div class="files"><code>app/api/*.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Response schemas with Field descriptions + examples</div>
+          <div class="desc">Every schema field has: description, examples (where applicable), constraints (ge/le for floats/ints). Response models include json_schema_extra with realistic usage examples.</div>
+          <div class="files"><code>app/schemas/*.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Shared error response schema</div>
+          <div class="desc">ErrorResponse and ValidationErrorResponse in schemas/__init__.py with realistic examples used across all endpoints.</div>
+          <div class="files"><code>app/schemas/__init__.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+      <div class="task">
+        <div class="task-check"><span class="dot green">✓</span></div>
+        <div class="task-content">
+          <div class="name">Consistent status code usage</div>
+          <div class="desc">Switched from hardcoded ints to starlette.status constants (HTTP_201_CREATED, HTTP_200_OK) for clarity.</div>
+          <div class="files"><code>app/api/*.py</code> &middot; 22 May 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== Summary ===== -->
   <div class="phase">
     <div class="phase-header">

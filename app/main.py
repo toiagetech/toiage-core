@@ -1,7 +1,6 @@
-import time
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from sqlmodel import text
 
@@ -12,33 +11,26 @@ from app.api.uploads import router as uploads_router
 from app.core.config import settings
 from app.db.session import engine
 from app.utils.exceptions import global_exception_handler, http_exception_handler
-from app.utils.logger import get_logger
-
-logger = get_logger("app", level=settings.LOG_LEVEL)
+from app.utils.observability import ObservabilityMiddleware
+from app.utils.security import (
+    RateLimitMiddleware,
+    RequestSizeLimitMiddleware,
+    setup_cors,
+)
 
 app = FastAPI(title="Toiage Core API")
+
+# --- CORS (allows frontend/mobile access) ---
+setup_cors(app)
+
+# --- Security middleware chain (order matters: auth → rate limit → size → observability) ---
+app.add_middleware(RateLimitMiddleware)
+app.add_middleware(RequestSizeLimitMiddleware)
+app.add_middleware(ObservabilityMiddleware)
 
 # --- Exception handlers ---
 app.add_exception_handler(Exception, global_exception_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
-
-# --- Request logging middleware ---
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    start = time.monotonic()
-    response = await call_next(request)
-    elapsed = time.monotonic() - start
-    logger.info(
-        "API request",
-        extra={
-            "method": request.method,
-            "path": str(request.url.path),
-            "status": response.status_code,
-            "elapsed_ms": round(elapsed * 1000, 2),
-        },
-    )
-    return response
-
 
 app.include_router(llm_router)
 app.include_router(stories_router)

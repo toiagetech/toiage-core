@@ -27,5 +27,9 @@ class Settings(BaseSettings):
     DEEPSEEK_BASE_URL: str = "https://api.deepseek.com/v1"
     DEEPSEEK_DEFAULT_MODEL: str = "deepseek-chat"
 
+    # Security
+    CORS_ALLOWED_ORIGINS: list[str] = ["*"]
+    MAX_REQUEST_BODY_SIZE_BYTES: int = 1_048_576  # 1 MB for JSON bodies (< uploads handled separately)
+
 
 settings = Settings()
