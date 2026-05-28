@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Toiage Phase 2A & 2B Python Development Plan</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+    background: #f4f7fb;
+    color: #222;
+    line-height: 1.7;
+}
+h1 { color: #1f4e79; }
+h2 { color: #1565c0; margin-top: 40px; }
+.step {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+pre {
+    background: #1e1e1e;
+    color: #f8f8f2;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+.note {
+    background: #fff8e1;
+    border-left: 5px solid #ffb300;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+</style>
+</head>
+<body>
+
+<h1>Toiage — Phase 2A & 2B Python Development Plan</h1>
+
+<div class="note">
+<h2>Important</h2>
+<p>This is a Python + FastAPI backend.</p>
+<ul>
+<li>Use .py files only</li>
+<li>Use Pydantic schemas</li>
+<li>Use Python enums</li>
+<li>Do NOT use TypeScript/NestJS structure</li>
+</ul>
+</div>
+
+<h2>Existing Structure</h2>
+
+<pre>
+app
+ ├── api
+ ├── core
+ ├── db
+ ├── models
+ ├── prompts
+ │    ├── activities
+ │    ├── stories
+ │    ├── reflections
+ │    └── system
+ ├── schemas
+ ├── services
+ └── utils
+</pre>
+
+<h2>Phase-2A — Project Domain Foundation</h2>
+
+<div class="step">
+<h3>STEP-1 — Create Incremental Project Folders</h3>
+
+<pre>
+mkdir -p app/api/projects
+mkdir -p app/models/project
+mkdir -p app/services/project
+mkdir -p app/schemas/project
+mkdir -p app/prompts/projects
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-2 — Create Project Category Model</h3>
+
+<pre>
+touch app/models/project/project_category.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-3 — Create Difficulty Model</h3>
+
+<pre>
+touch app/models/project/project_difficulty.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-4 — Create Grade Mapping Model</h3>
+
+<pre>
+touch app/models/project/project_grade.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-5 — Create Project Metadata Schema</h3>
+
+<pre>
+touch app/schemas/project/project_metadata_schema.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-6 — Create Project Seed Data</h3>
+
+<pre>
+touch app/db/project_seed_data.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-7 — Create Project Listing API</h3>
+
+<pre>
+touch app/api/projects/project_list_api.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-8 — Create Project Details API</h3>
+
+<pre>
+touch app/api/projects/project_details_api.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-9 — Create Material Type Model</h3>
+
+<pre>
+touch app/models/project/material_type.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-10 — Add Material Availability Inputs</h3>
+
+<p>Allow parents to select available materials.</p>
+</div>
+
+<div class="step">
+<h3>STEP-11 — Create Recommendation Service</h3>
+
+<pre>
+touch app/services/project/project_recommendation_service.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-12 — Create Project Prompt Template</h3>
+
+<pre>
+touch app/prompts/projects/project_generation_prompt.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-13 — Add Structured Prompt Variables</h3>
+
+<p>Add grade, materials, difficulty and learning goals.</p>
+</div>
+
+<div class="step">
+<h3>STEP-14 — Add Learning Objective Mapping</h3>
+
+<p>Map projects to STEM and communication skills.</p>
+</div>
+
+<div class="step">
+<h3>STEP-15 — Create Validation Layer</h3>
+
+<pre>
+touch app/core/project_validation.py
+</pre>
+</div>
+
+<h2>Phase-2B — Guided Project Workflow</h2>
+
+<div class="step">
+<h3>STEP-16 — Create Workflow Folders</h3>
+
+<pre>
+mkdir -p app/api/workflows
+mkdir -p app/models/workflow
+mkdir -p app/services/workflow
+mkdir -p app/schemas/workflow
+mkdir -p app/prompts/workflow
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-17 — Create Workflow Schema</h3>
+
+<pre>
+touch app/schemas/workflow/project_workflow_schema.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-18 — Create Story Context Service</h3>
+
+<pre>
+touch app/services/workflow/project_story_context_service.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-19 — Create Material Planner Service</h3>
+
+<pre>
+touch app/services/workflow/material_planner_service.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-20 — Create Build Steps Generator</h3>
+
+<pre>
+touch app/services/workflow/build_steps_service.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-21 — Create Science Explanation Service</h3>
+
+<pre>
+touch app/services/workflow/science_explanation_service.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-22 — Create Presentation Assistant</h3>
+
+<pre>
+touch app/services/workflow/project_presentation_service.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-23 — Create Workflow Orchestrator</h3>
+
+<pre>
+touch app/core/project_workflow_orchestrator.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-24 — Create Main Workflow API</h3>
+
+<pre>
+touch app/api/workflows/project_workflow_api.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-25 — Add Workflow Response Formatter</h3>
+
+<pre>
+touch app/utils/workflow_response_formatter.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-26 — Add AI Safety Validation</h3>
+
+<pre>
+touch app/core/project_safety_validation.py
+</pre>
+</div>
+
+<div class="step">
+<h3>STEP-27 — Add Estimated Completion Time</h3>
+
+<p>Generate preparation and execution time estimates.</p>
+</div>
+
+<div class="step">
+<h3>STEP-28 — Add Parent Guidance Notes</h3>
+
+<p>Generate supervision and preparation guidance.</p>
+</div>
+
+<div class="step">
+<h3>STEP-29 — Add Learning Outcomes</h3>
+
+<p>Generate STEM and communication outcomes.</p>
+</div>
+
+<div class="step">
+<h3>STEP-30 — Add End-to-End Workflow Tests</h3>
+
+<p>Add regression tests for workflow generation and validation.</p>
+</div>
+
+</body>
+</html>

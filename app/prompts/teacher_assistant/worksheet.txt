@@ -1,0 +1,54 @@
+Generate a practice worksheet for CBSE Class {grade} {subject} students.
+
+Chapter: {chapter}
+Topic: {topic}
+Total Marks: {total_marks}
+Difficulty Level: {difficulty}
+
+The worksheet should include a mix of:
+- Multiple choice questions (1 mark each)
+- Fill in the blanks (1 mark each)
+- True/False with correction (1 mark each)
+- Match the following (1 mark each)
+- Short answer questions (2-3 marks each)
+- Long answer questions (5 marks each)
+
+Align with CBSE NCERT curriculum.
+
+Respond in the following JSON format (pure JSON only, no markdown):
+{{
+  "subject": "{subject}",
+  "grade": "{grade}",
+  "chapter": "{chapter}",
+  "topic": "{topic}",
+  "total_marks": {total_marks},
+  "sections": [
+    {{
+      "section_name": "Section A - Multiple Choice Questions",
+      "section_type": "mcq",
+      "marks_per_question": 1,
+      "questions": [
+        {{
+          "question_number": 1,
+          "question_text": "Question?",
+          "options": {{"A": "...", "B": "...", "C": "...", "D": "..."}},
+          "correct_answer": "A"
+        }}
+      ]
+    }},
+    {{
+      "section_name": "Section B - Fill in the Blanks",
+      "section_type": "fill_blanks",
+      "marks_per_question": 1,
+      "questions": [
+        {{
+          "question_number": 6,
+          "question_text": "The _____ is the largest organ of the human body.",
+          "answer": "skin"
+        }}
+      ]
+    }}
+  ],
+  "total_time_minutes": "e.g., 45",
+  "instructions": ["instruction 1", "instruction 2"]
+}}

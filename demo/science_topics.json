@@ -1,0 +1,82 @@
+[
+  {
+    "grade": 6,
+    "subject": "Science",
+    "topic": "Water Conservation",
+    "difficulty": "medium",
+    "description": "Understanding the importance of water and methods to conserve it",
+    "chapters": ["Water"]
+  },
+  {
+    "grade": 6,
+    "subject": "Science",
+    "topic": "Plant Growth and Photosynthesis",
+    "difficulty": "easy",
+    "description": "How plants grow and make their own food",
+    "chapters": ["Getting to Know Plants", "Food-Where Does It Come From"]
+  },
+  {
+    "grade": 6,
+    "subject": "Science",
+    "topic": "Simple Electric Circuits",
+    "difficulty": "medium",
+    "description": "Building basic electric circuits with bulbs, batteries, and switches",
+    "chapters": ["Electricity and Circuits"]
+  },
+  {
+    "grade": 6,
+    "subject": "Science",
+    "topic": "Magnetism",
+    "difficulty": "easy",
+    "description": "Properties of magnets and magnetic fields",
+    "chapters": ["Fun with Magnets"]
+  },
+  {
+    "grade": 7,
+    "subject": "Science",
+    "topic": "Soil Types and Properties",
+    "difficulty": "easy",
+    "description": "Different types of soil and their characteristics",
+    "chapters": ["Soil"]
+  },
+  {
+    "grade": 7,
+    "subject": "Science",
+    "topic": "Physical and Chemical Changes",
+    "difficulty": "medium",
+    "description": "Distinguishing between physical and chemical changes",
+    "chapters": ["Physical and Chemical Changes"]
+  },
+  {
+    "grade": 7,
+    "subject": "Science",
+    "topic": "Heat Transfer",
+    "difficulty": "medium",
+    "description": "Methods of heat transfer: conduction, convection, and radiation",
+    "chapters": ["Heat"]
+  },
+  {
+    "grade": 8,
+    "subject": "Science",
+    "topic": "Force and Pressure",
+    "difficulty": "hard",
+    "description": "Understanding forces, pressure, and their applications",
+    "chapters": ["Force and Pressure"]
+  },
+  {
+    "grade": 8,
+    "subject": "Science",
+    "topic": "Chemical Effects of Electric Current",
+    "difficulty": "hard",
+    "description": "How electric current causes chemical reactions",
+    "chapters": ["Chemical Effects of Electric Current"]
+  },
+  {
+    "grade": 8,
+    "subject": "Science",
+    "topic": "Conservation of Plants and Animals",
+    "difficulty": "medium",
+    "description": "Biodiversity conservation and ecosystem balance",
+    "chapters": ["Conservation of Plants and Animals"]
+  }
+]

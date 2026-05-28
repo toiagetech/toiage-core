@@ -1,0 +1,31 @@
+Generate a detailed materials list for the following science project.
+
+Project Title: {project_title}
+Subject: {subject}
+Grade: {grade}
+Topic: {topic}
+Difficulty: {difficulty}
+
+List all materials needed including:
+- Common household items available in India (e.g., cardboard, bottles, wires, batteries)
+- Quantities for each item
+- Approximate cost in rupees
+- Where to source (e.g., "stationery shop", "kitchen", "hardware store")
+
+Respond in the following JSON format (pure JSON only, no markdown):
+{{
+  "project_title": "{project_title}",
+  "materials": [
+    {{
+      "item": "Name of item",
+      "quantity": "e.g., 2",
+      "unit": "e.g., pieces, meters, liters",
+      "estimated_cost_rs": 50,
+      "source": "e.g., Kitchen, stationery shop",
+      "notes": "optional note"
+    }}
+  ],
+  "total_estimated_cost_rs": 250,
+  "safety_items_required": ["item 1", "item 2"],
+  "alternative_materials": ["alt 1", "alt 2"]
+}}

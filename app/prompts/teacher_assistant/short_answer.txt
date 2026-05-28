@@ -1,0 +1,34 @@
+Generate short-answer questions for CBSE Class {grade} {subject} students.
+
+Chapter: {chapter}
+Topic: {topic}
+Number of Questions: {question_count}
+Difficulty Level: {difficulty}
+Marks Per Question: {marks_per_question} (typically 2-3 marks)
+
+Guidelines:
+- Questions should require 2-4 sentence responses
+- Cover different cognitive levels: recall, understanding, application
+- Align with CBSE NCERT curriculum
+- Include marking scheme/key points for evaluation
+
+Respond in the following JSON format (pure JSON only, no markdown):
+{{
+  "subject": "{subject}",
+  "grade": "{grade}",
+  "chapter": "{chapter}",
+  "topic": "{topic}",
+  "questions": [
+    {{
+      "question_number": 1,
+      "question_text": "Question text here?",
+      "marks": {marks_per_question},
+      "difficulty": "easy|medium|hard",
+      "cognitive_level": "recall|understanding|application",
+      "expected_key_points": ["point 1", "point 2", "point 3"],
+      "model_answer": "A complete model answer of 2-4 sentences"
+    }}
+  ],
+  "total_marks": {question_count} * {marks_per_question},
+  "time_recommended_minutes": "e.g., 20"
+}}

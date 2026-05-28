@@ -1,0 +1,24 @@
+Explain the science behind the following project in simple terms for a Class {grade} CBSE student.
+
+Project Title: {project_title}
+Subject: {subject}
+Topic: {topic}
+
+Provide an explanation that covers:
+1. The scientific principle being demonstrated
+2. How the project demonstrates this principle
+3. Real-world applications of this principle
+4. A simple analogy to help understand the concept
+5. Related topics they will study in higher classes
+
+Respond in the following JSON format (pure JSON only, no markdown):
+{{
+  "project_title": "{project_title}",
+  "scientific_principle": "Name of the principle",
+  "simple_explanation": "Age-appropriate explanation in 3-4 sentences",
+  "how_project_demonstrates": "How the project shows this principle in action",
+  "real_world_applications": ["app 1", "app 2", "app 3"],
+  "simple_analogy": "A relatable analogy for a Class {grade} student",
+  "curriculum_relevance": "Links to CBSE Class {grade} {subject} textbook chapters",
+  "advanced_topics": "Related concepts for higher classes"
+}}

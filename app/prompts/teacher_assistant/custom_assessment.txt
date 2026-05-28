@@ -1,0 +1,44 @@
+Generate a custom assessment for CBSE Class {grade} {subject} students.
+
+Chapter: {chapter}
+Topic: {topic}
+Difficulty Level: {difficulty}
+
+The teacher has specified the following question types and marks distribution:
+
+{question_specs}
+
+For each question, include the correct answer or model answer.
+Align with CBSE NCERT curriculum.
+
+Respond in the following JSON format (pure JSON only, no markdown):
+{{
+  "subject": "{subject}",
+  "grade": "{grade}",
+  "chapter": "{chapter}",
+  "topic": "{topic}",
+  "sections": [
+    {{
+      "section_name": "e.g., Section A - Multiple Choice Questions",
+      "section_type": "mcq|short_answer|long_answer",
+      "marks_per_question": 1,
+      "number_of_questions": 5,
+      "total_section_marks": 5,
+      "questions": [
+        {{
+          "question_number": 1,
+          "question_text": "Question text?",
+          "options": {{"A": "...", "B": "...", "C": "...", "D": "..."}},
+          "correct_answer": "A",
+          "difficulty": "easy|medium|hard",
+          "cognitive_level": "recall|understanding|application|analysis",
+          "marks": 1,
+          "model_answer": "For MCQ: explanation. For short/long: full answer"
+        }}
+      ]
+    }}
+  ],
+  "total_marks": 30,
+  "time_recommended_minutes": "e.g., 60",
+  "instructions": ["instruction 1", "instruction 2"]
+}}

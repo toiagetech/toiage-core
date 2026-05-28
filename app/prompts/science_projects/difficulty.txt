@@ -1,0 +1,36 @@
+Analyze the difficulty level of the following science project for a CBSE Class {grade} student.
+
+Project Title: {project_title}
+Topic: {topic}
+Materials Required: {materials_summary}
+Build Steps Summary: {steps_summary}
+
+Evaluate the project across these dimensions:
+1. Material complexity — how hard are materials to obtain?
+2. Build complexity — how many steps and how intricate?
+3. Concept complexity — how advanced is the scientific concept?
+4. Time required — is it reasonable for a Class {grade} student?
+5. Safety concerns — are there any?
+
+Respond in the following JSON format (pure JSON only, no markdown):
+{{
+  "project_title": "{project_title}",
+  "overall_difficulty": "easy|medium|hard",
+  "material_complexity": {{
+    "rating": 1-5,
+    "explanation": "Why this rating"
+  }},
+  "build_complexity": {{
+    "rating": 1-5,
+    "explanation": "Why this rating"
+  }},
+  "concept_complexity": {{
+    "rating": 1-5,
+    "explanation": "Why this rating"
+  }},
+  "estimated_time_minutes": 120,
+  "adult_supervision_level": "none|minimal|moderate|extensive",
+  "recommended_for_grade": "{grade}",
+  "can_be_simplified": true,
+  "simplification_tips": ["tip 1", "tip 2"]
+}}

@@ -1,0 +1,122 @@
+[
+  {
+    "grade": 6,
+    "subject": "Science",
+    "project_title": "Working Model of Rainwater Harvesting",
+    "topic": "Water Conservation",
+    "difficulty": "medium",
+    "short_description": "Build a working model showing how rainwater can be collected and stored.",
+    "estimated_build_time": "2-3 hours",
+    "estimated_cost": "₹150-₹300",
+    "key_materials": ["Cardboard box", "Plastic bottles", "Funnel", "Clay", "Paint", "Measuring cup"],
+    "learning_objectives": ["Understand water cycle", "Learn conservation methods", "Model real-world systems"]
+  },
+  {
+    "grade": 6,
+    "subject": "Science",
+    "project_title": "Seed Germination Observation Chamber",
+    "topic": "Plant Growth and Photosynthesis",
+    "difficulty": "easy",
+    "short_description": "Create a transparent chamber to observe seed germination and early plant growth.",
+    "estimated_build_time": "1-2 hours (observation over 7 days)",
+    "estimated_cost": "₹50-₹100",
+    "key_materials": ["Clear plastic cup", "Cotton", "Bean seeds", "Water", "Sunlight"],
+    "learning_objectives": ["Understand germination process", "Observe plant growth stages", "Learn about conditions needed for growth"]
+  },
+  {
+    "grade": 6,
+    "subject": "Science",
+    "project_title": "Simple Electric Circuit Board",
+    "topic": "Simple Electric Circuits",
+    "difficulty": "medium",
+    "short_description": "Build a working electric circuit with switch, bulb, and battery.",
+    "estimated_build_time": "1-2 hours",
+    "estimated_cost": "₹100-₹200",
+    "key_materials": ["Battery", "Bulb holder", "Bulb", "Switch", "Connecting wires", "Cardboard base"],
+    "learning_objectives": ["Understand closed circuits", "Learn about conductors", "Build functional electrical system"]
+  },
+  {
+    "grade": 7,
+    "subject": "Science",
+    "project_title": "Working Model of Soil Percolation",
+    "topic": "Soil Types and Properties",
+    "difficulty": "easy",
+    "short_description": "Compare water percolation rates across different soil types.",
+    "estimated_build_time": "1-2 hours",
+    "estimated_cost": "₹100-₹150",
+    "key_materials": ["Plastic bottles", "Different soil samples", "Water", "Measuring cylinder", "Stopwatch"],
+    "learning_objectives": ["Understand soil types", "Learn percolation rates", "Compare soil water retention"]
+  },
+  {
+    "grade": 7,
+    "subject": "Science",
+    "project_title": "Physical vs Chemical Change Demonstrator",
+    "topic": "Physical and Chemical Changes",
+    "difficulty": "medium",
+    "short_description": "Demonstrate and compare physical and chemical changes through simple experiments.",
+    "estimated_build_time": "2-3 hours",
+    "estimated_cost": "₹150-₹250",
+    "key_materials": ["Candle", "Ice cubes", "Vinegar", "Baking soda", "Metal wire", "Magnifying glass"],
+    "learning_objectives": ["Distinguish physical vs chemical changes", "Observe reactions", "Understand reversibility"]
+  },
+  {
+    "grade": 7,
+    "subject": "Science",
+    "project_title": "Heat Conduction Comparison Model",
+    "topic": "Heat Transfer",
+    "difficulty": "medium",
+    "short_description": "Compare heat conduction through different materials using a simple apparatus.",
+    "estimated_build_time": "2-3 hours",
+    "estimated_cost": "₹200-₹350",
+    "key_materials": ["Metal rods (different metals)", "Candle", "Thermometer", "Stopwatch", "Heat source"],
+    "learning_objectives": ["Understand conduction", "Compare material conductivity", "Learn heat transfer methods"]
+  },
+  {
+    "grade": 8,
+    "subject": "Science",
+    "project_title": "Hydraulic Lift Working Model",
+    "topic": "Force and Pressure",
+    "difficulty": "hard",
+    "short_description": "Build a working hydraulic lift model demonstrating Pascal's law.",
+    "estimated_build_time": "3-4 hours",
+    "estimated_cost": "₹300-₹500",
+    "key_materials": ["Syringes (2)", "Plastic tubing", "Cardboard", "Glue", "Water", "Small weight"],
+    "learning_objectives": ["Understand Pascal's law", "Learn hydraulic systems", "Apply force multiplication principle"]
+  },
+  {
+    "grade": 8,
+    "subject": "Science",
+    "project_title": "Electroplating Demonstration Setup",
+    "topic": "Chemical Effects of Electric Current",
+    "difficulty": "hard",
+    "short_description": "Demonstrate electroplating using copper sulfate solution and electric current.",
+    "estimated_build_time": "2-3 hours",
+    "estimated_cost": "₹250-₹400",
+    "key_materials": ["Battery", "Copper sulfate", "Copper plate", "Iron nail", "Connecting wires", "Glass container"],
+    "learning_objectives": ["Understand electrolysis", "Learn electroplating process", "Observe chemical effects of current"]
+  },
+  {
+    "grade": 8,
+    "subject": "Science",
+    "project_title": "Ecosystem in a Bottle",
+    "topic": "Conservation of Plants and Animals",
+    "difficulty": "medium",
+    "short_description": "Create a self-sustaining mini-ecosystem in a sealed bottle.",
+    "estimated_build_time": "2-3 hours (observation over weeks)",
+    "estimated_cost": "₹200-₹300",
+    "key_materials": ["Large plastic bottle", "Soil", "Small plants", "Small stones", "Water", "Tape"],
+    "learning_objectives": ["Understand ecosystem balance", "Learn food chains", "Observe water and nutrient cycles"]
+  },
+  {
+    "grade": 6,
+    "subject": "Science",
+    "project_title": "Build Your Own Compass",
+    "topic": "Magnetism",
+    "difficulty": "easy",
+    "short_description": "Create a simple magnetic compass using a needle, magnet, and water.",
+    "estimated_build_time": "30-60 minutes",
+    "estimated_cost": "₹50-₹100",
+    "key_materials": ["Sewing needle", "Bar magnet", "Bowl of water", "Cork or paper", "Tape"],
+    "learning_objectives": ["Understand magnetic poles", "Learn Earth's magnetic field", "Build navigation instrument"]
+  }
+]

@@ -1,0 +1,88 @@
+[
+  {
+    "type": "mcq",
+    "grade": 6,
+    "subject": "Science",
+    "chapter": "Water",
+    "topic": "Water Conservation",
+    "question_count": 5,
+    "difficulty": "easy",
+    "sample_question": {
+      "question_number": 1,
+      "question_text": "What percentage of Earth's surface is covered with water?",
+      "options": {"A": "50%", "B": "71%", "C": "90%", "D": "30%"},
+      "correct_answer": "B",
+      "difficulty": "easy",
+      "cognitive_level": "recall"
+    }
+  },
+  {
+    "type": "mcq",
+    "grade": 7,
+    "subject": "Science",
+    "chapter": "Physical and Chemical Changes",
+    "topic": "Chemical Changes",
+    "question_count": 5,
+    "difficulty": "medium",
+    "sample_question": {
+      "question_number": 1,
+      "question_text": "Which of the following is an example of a chemical change?",
+      "options": {"A": "Melting of ice", "B": "Rusting of iron", "C": "Cutting of paper", "D": "Breaking of glass"},
+      "correct_answer": "B",
+      "difficulty": "medium",
+      "cognitive_level": "understanding"
+    }
+  },
+  {
+    "type": "short_answer",
+    "grade": 6,
+    "subject": "Science",
+    "chapter": "Electricity and Circuits",
+    "topic": "Simple Circuits",
+    "question_count": 3,
+    "difficulty": "medium",
+    "marks_per_question": 2,
+    "sample_question": {
+      "question_number": 1,
+      "question_text": "What is the purpose of a switch in an electric circuit?",
+      "marks": 2,
+      "difficulty": "easy",
+      "expected_key_points": ["Controls flow of electricity", "Can open or close circuit", "Allows turning devices on/off"],
+      "model_answer": "A switch is used to complete or break an electric circuit. When the switch is in the 'ON' position, the circuit is complete and current flows through it. When it is in the 'OFF' position, the circuit is broken and current stops flowing."
+    }
+  },
+  {
+    "type": "long_answer",
+    "grade": 8,
+    "subject": "Science",
+    "chapter": "Force and Pressure",
+    "topic": "Liquid Pressure",
+    "question_count": 2,
+    "difficulty": "hard",
+    "marks_per_question": 5,
+    "sample_question": {
+      "question_number": 1,
+      "question_text": "Explain Pascal's law. Describe an application of this principle in daily life.",
+      "total_marks": 5,
+      "difficulty": "hard",
+      "cognitive_level": "analysis",
+      "expected_key_points": ["Statement of Pascal's law", "Pressure transmission in liquids", "Hydraulic systems example", "Force multiplication principle", "Real-world application"],
+      "model_answer": "Pascal's law states that pressure applied to an enclosed liquid is transmitted equally in all directions throughout the liquid. This principle is used in hydraulic lifts and brakes. In a hydraulic lift, a small force applied on a small piston creates pressure that is transmitted through the liquid to a larger piston, multiplying the force. This allows heavy objects to be lifted with relatively small effort."
+    }
+  },
+  {
+    "type": "exam_paper",
+    "grade": 7,
+    "subject": "Science",
+    "chapters": "Heat, Soil, Physical and Chemical Changes",
+    "total_marks": 50,
+    "difficulty_distribution": {"easy": 30, "medium": 50, "hard": 20},
+    "pattern": {
+      "mcq_count": 10,
+      "vsa_count": 5,
+      "sa_count": 5,
+      "la_count": 3,
+      "marks_calculation": "MCQ(10×1=10) + VSA(5×2=10) + SA(5×3=15) + LA(3×5=15) = 50"
+    }
+  }
+]

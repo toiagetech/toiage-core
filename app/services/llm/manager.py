@@ -14,6 +14,13 @@ request_id_var: ContextVar[str] = ContextVar("request_id", default="N/A")
 
 logger = get_logger("app.llm.manager")
 
+# Lazily imported providers (optional dependencies)
+_LAZY_PROVIDERS: dict[str, str] = {
+    "openai": "app.services.llm.openai.OpenAIProvider",
+    "gemini": "app.services.llm.gemini.GeminiProvider",
+    "ollama": "app.services.llm.ollama.OllamaProvider",
+}
+
 PROVIDER_MAP: dict[str, type[BaseLLMProvider]] = {
     "mock": MockLLMProvider,
     "openrouter": OpenRouterProvider,
@@ -48,7 +55,22 @@ class LLMManager:
         if provider_name not in self._providers:
             provider_cls = PROVIDER_MAP.get(provider_name)
             if not provider_cls:
-                raise ValueError(f"Unknown LLM provider: {provider_name}")
+                # Try lazy import for optional providers
+                lazy_path = _LAZY_PROVIDERS.get(provider_name)
+                if lazy_path:
+                    try:
+                        import importlib
+                        module_path, class_name = lazy_path.rsplit(".", 1)
+                        module = importlib.import_module(module_path)
+                        provider_cls = getattr(module, class_name)
+                    except (ImportError, AttributeError, ModuleNotFoundError):
+                        raise ValueError(
+                            f"Provider '{provider_name}' not available. "
+                            f"Install optional dependency or use a different provider. "
+                            f"Available providers: {list(PROVIDER_MAP.keys())} + optional (openai, gemini, ollama)"
+                        )
+                else:
+                    raise ValueError(f"Unknown LLM provider: {provider_name}")
             self._providers[provider_name] = provider_cls()
         return self._providers[provider_name]
 

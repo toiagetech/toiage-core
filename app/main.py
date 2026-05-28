@@ -8,6 +8,9 @@ from app.api.activities import router as activities_router
 from app.api.llm import router as llm_router
 from app.api.stories import router as stories_router
 from app.api.uploads import router as uploads_router
+from app.api.science_projects import router as science_projects_router
+from app.api.teacher_assistant import router as teacher_assistant_router
+from app.api.prototype_docs import router as prototype_docs_router
 from app.core.config import settings
 from app.db.session import engine
 from app.utils.exceptions import global_exception_handler, http_exception_handler
@@ -18,7 +21,11 @@ from app.utils.security import (
     setup_cors,
 )
 
-app = FastAPI(title="Toiage Core API")
+app = FastAPI(
+    title="Toiage Core — Educational Intelligence Platform",
+    description="API for generating curriculum-aligned science projects, assessments, and educational content for CBSE classes 6-8.",
+    version="2.0.0",
+)
 
 # --- CORS (allows frontend/mobile access) ---
 setup_cors(app)
@@ -36,6 +43,9 @@ app.include_router(llm_router)
 app.include_router(stories_router)
 app.include_router(activities_router)
 app.include_router(uploads_router)
+app.include_router(science_projects_router)
+app.include_router(teacher_assistant_router)
+app.include_router(prototype_docs_router)
 
 # Mount uploads directory for serving uploaded files
 uploads_path = Path(settings.UPLOAD_DIR)

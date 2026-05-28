@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toiage Core — Educational Intelligence Platform Progress</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+    .container { max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 2rem; font-weight: 700; color: #0f172a; }
+    h2 { font-size: 1.4rem; font-weight: 600; color: #1e293b; margin-bottom: 16px; }
+    .subtitle { color: #64748b; margin-bottom: 32px; }
+    .meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+    .meta-item {
+      background: #fff;
+      border-radius: 8px;
+      padding: 12px 18px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      font-size: 0.9rem;
+    }
+    .meta-item .label { color: #64748b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .meta-item .value { font-weight: 600; font-size: 1.1rem; }
+
+    .phase {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .phase-header {
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .phase-header h3 { font-size: 1.1rem; font-weight: 600; }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .badge-done { background: #dcfce7; color: #166534; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .phase-body { padding: 0 24px 18px; }
+    .step-list { list-style: none; }
+    .step-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+    .step-list li:last-child { border-bottom: none; }
+    .step-check { color: #166534; font-weight: bold; }
+    .step-uncheck { color: #94a3b8; }
+    .step-desc { color: #475569; font-size: 0.85rem; }
+
+    .endpoint-list { margin-top: 12px; }
+    .endpoint-list code {
+      display: block;
+      background: #f1f5f9;
+      padding: 6px 12px;
+      border-radius: 6px;
+      margin: 4px 0;
+      font-size: 0.85rem;
+      color: #0f172a;
+    }
+    .endpoint-list .method {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+    .method-post { background: #dbeafe; color: #1e40af; }
+    .method-get { background: #dcfce7; color: #166534; }
+
+    .file-tree { margin-top: 12px; }
+    .file-tree .file {
+      padding: 3px 0;
+      font-size: 0.85rem;
+      color: #475569;
+    }
+    .file-tree .file span { color: #0f172a; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Toiage Core — Educational Intelligence Platform</h1>
+    <p class="subtitle">Phase 2: Transition from generic AI generation to educational intelligence platform for CBSE classes 6-8</p>
+
+    <div class="meta">
+      <div class="meta-item"><div class="label">Completed</div><div class="value">28 May 2026</div></div>
+      <div class="meta-item"><div class="label">Status</div><div class="value">✅ 19/20 Steps Done</div></div>
+      <div class="meta-item"><div class="label">New Files</div><div class="value">~40</div></div>
+      <div class="meta-item"><div class="label">New APIs</div><div class="value">8 Endpoints</div></div>
+      <div class="meta-item"><div class="label">Grade Support</div><div class="value">CBSE 6, 7, 8</div></div>
+    </div>
+
+    <!-- Phase A -->
+    <div class="phase">
+      <div class="phase-header">
+        <h3>Phase A — Foundation: Domain Modules, Prompts, Schemas, Models</h3>
+        <span class="badge badge-done">Steps 1-5 ✓</span>
+      </div>
+      <div class="phase-body">
+        <ul class="step-list">
+          <li><span class="step-check">✓</span> <strong>Step 1:</strong> Created service directory structure <span class="step-desc">(science_projects, teacher_assistant, orchestration, validations)</span></li>
+          <li><span class="step-check">✓</span> <strong>Steps 2-3:</strong> Created 10 prompt templates <span class="step-desc">(5 science project, 5 teacher assistant) with JSON output format</span></li>
+          <li><span class="step-check">✓</span> <strong>Step 4:</strong> Defined structured Pydantic schemas <span class="step-desc">(ScienceProject, MaterialItem, BuildStep, MCQ, ExamPaper, Worksheet, etc.)</span></li>
+          <li><span class="step-check">✓</span> <strong>Step 5:</strong> Created 3 SQLModel tables with Alembic migration <span class="step-desc">(curriculum_master, assessment_config, project_metadata_config)</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase B -->
+    <div class="phase">
+      <div class="phase-header">
+        <h3>Phase B — Services & Infrastructure</h3>
+        <span class="badge badge-done">Steps 6-10 ✓</span>
+      </div>
+      <div class="phase-body">
+        <ul class="step-list">
+          <li><span class="step-check">✓</span> <strong>Step 6:</strong> ScienceProjectService — 5-step generation pipeline <span class="step-desc">(validate → generate idea → materials → build steps → explanation → difficulty)</span></li>
+          <li><span class="step-check">✓</span> <strong>Step 7:</strong> TeacherAssistantService — 5 assessment types <span class="step-desc">(MCQ, short answer, long answer, worksheet, exam paper)</span></li>
+          <li><span class="step-check">✓</span> <strong>Step 8:</strong> Orchestrator class with retry handling and JSON cleanup</li>
+          <li><span class="step-check">✓</span> <strong>Step 9:</strong> Prompt orchestration layer <span class="step-desc">(model routing, context injection, retry, response parsing)</span></li>
+          <li><span class="step-check">✓</span> <strong>Step 10:</strong> 3 new LLM providers (lazy-loaded) <span class="step-desc">(OpenAI, Gemini, Ollama) — added to PROVIDER_MAP</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Phase C -->
+    <div class="phase">
+      <div class="phase-header">
+        <h3>Phase C — APIs, Validation, Configs</h3>
+        <span class="badge badge-done">Steps 11-13 ✓</span>
+      </div>
+      <div class="phase-body">
+        <ul class="step-list">
+          <li><span class="step-check">✓</span> <strong>Step 11:</strong> 8 new API endpoints registered in FastAPI</li>
+          <li><span class="step-check">✓</span> <strong>Step 12:</strong> EducationalValidator — validates materials, complexity, question papers, difficulty balance</li>
+          <li><span class="step-check">✓</span> <strong>Step 13:</strong> 3 config modules <span class="step-desc">(grade_rules, difficulty_rules, assessment_patterns)</span></li>
+        </ul>
+        <div class="endpoint-list">
+          <code><span class="method method-post">POST</span> /api/v1/science-projects/generate</code>
+          <code><span class="method method-post">POST</span> /api/v1/teacher-assistant/mcq</code>
+          <code><span class="method method-post">POST</span> /api/v1/teacher-assistant/short-answer</code>
+          <code><span class="method method-post">POST</span> /api/v1/teacher-assistant/long-answer</code>
+          <code><span class="method method-post">POST</span> /api/v1/teacher-assistant/worksheet</code>
+          <code><span class="method method-post">POST</span> /api/v1/teacher-assistant/custom-assessment</code>
+          <code><span class="method method-post">POST</span> /api/v1/teacher-assistant/exam-paper</code>
+          <code><span class="method method-post">POST</span> /api/v1/prototypes/{id}/photos</code>
+          <code><span class="method method-post">POST</span> /api/v1/prototypes/{id}/notes</code>
+          <code><span class="method method-get">GET</span> /api/v1/prototypes/{id}/records</code>
+          <code><span class="method method-post">POST</span> /api/v1/prototypes/{id}/cost-sheet</code>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase D -->
+    <div class="phase">
+      <div class="phase-header">
+        <h3>Phase D — Intelligence Layer & Demo Data</h3>
+        <span class="badge badge-done">Steps 14-19 ✓</span>
+      </div>
+      <div class="phase-body">
+        <ul class="step-list">
+          <li><span class="step-check">✓</span> <strong>Step 14:</strong> Curriculum metadata tables ready for CBSE class 6-8 seed data</li>
+          <li><span class="step-check">✓</span> <strong>Step 15:</strong> ProjectRecommender — topic-based recommendations with budget/grade awareness</li>
+          <li><span class="step-check">✓</span> <strong>Step 16:</strong> ExamPatternEngine — CBSE exam pattern builder with marks distribution</li>
+          <li><span class="step-check">✓</span> <strong>Step 17:</strong> PrototypeInstruction output <span class="step-desc">(materials with quantities, build steps, cost, precautions)</span></li>
+          <li><span class="step-check">✓</span> <strong>Step 18:</strong> Documentation support APIs <span class="step-desc">(photos, notes, build records, cost sheets — local storage)</span></li>
+          <li><span class="step-check">✓</span> <strong>Step 19:</strong> Demo dataset created <span class="step-desc">(10 science topics, 10 project examples, 5 assessment examples)</span></li>
+        </ul>
+        <div class="file-tree">
+          <div class="file"><span>demo/</span> science_topics.json — 10 curated CBSE topics</div>
+          <div class="file"><span>demo/</span> project_examples.json — 10 project ideas with materials</div>
+          <div class="file"><span>demo/</span> assessment_examples.json — 5 assessment templates</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase E -->
+    <div class="phase">
+      <div class="phase-header">
+        <h3>Phase E — Manual Validation</h3>
+        <span class="badge badge-pending">Step 20 ⏳</span>
+      </div>
+      <div class="phase-body">
+        <p style="color: #64748b; font-size: 0.9rem;">Manual review required. Check outputs for:</p>
+        <ul class="step-list">
+          <li><span class="step-uncheck">○</span> Educational quality and age-appropriateness</li>
+          <li><span class="step-uncheck">○</span> Practical feasibility of materials and build steps</li>
+          <li><span class="step-uncheck">○</span> Clarity of instructions for students</li>
+          <li><span class="step-uncheck">○</span> Correctness of assessment questions and answers</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- New Files Summary -->
+    <h2 style="margin-top: 32px;">📁 File Inventory — New Files Created</h2>
+    <div class="phase" style="margin-top: 12px;">
+      <div class="phase-body">
+        <div class="file-tree">
+          <div class="file"><span>app/api/science_projects.py</span> — Science project generation endpoint</div>
+          <div class="file"><span>app/api/teacher_assistant.py</span> — Teacher assistant assessment endpoints (5)</div>
+          <div class="file"><span>app/api/prototype_docs.py</span> — Prototype documentation support (4 endpoints)</div>
+          <div class="file"><span>app/schemas/science_project.py</span> — Science project Pydantic models</div>
+          <div class="file"><span>app/schemas/assessment.py</span> — Assessment Pydantic models (MCQ, exam paper, etc.)</div>
+          <div class="file"><span>app/schemas/worksheet.py</span> — Worksheet request/response schemas</div>
+          <div class="file"><span>app/models/curriculum.py</span> — CurriculumMaster SQLModel</div>
+          <div class="file"><span>app/models/project_metadata.py</span> — ProjectMetadataConfig SQLModel</div>
+          <div class="file"><span>app/models/assessment_pattern.py</span> — AssessmentConfig SQLModel</div>
+          <div class="file"><span>app/services/science_projects/service.py</span> — ScienceProjectService class</div>
+          <div class="file"><span>app/services/science_projects/recommendation.py</span> — ProjectRecommender logic</div>
+          <div class="file"><span>app/services/teacher_assistant/service.py</span> — TeacherAssistantService class</div>
+          <div class="file"><span>app/services/teacher_assistant/exam_patterns.py</span> — ExamPatternEngine logic</div>
+          <div class="file"><span>app/services/orchestration/pipeline_runner.py</span> — Orchestrator with retry/JSON parsing</div>
+          <div class="file"><span>app/services/validations/educational_validator.py</span> — EducationalValidator class</div>
+          <div class="file"><span>app/services/llm/openai.py</span> — OpenAI provider (lazy-loaded)</div>
+          <div class="file"><span>app/services/llm/gemini.py</span> — Gemini provider (lazy-loaded)</div>
+          <div class="file"><span>app/services/llm/ollama.py</span> — Ollama provider (lazy-loaded)</div>
+          <div class="file"><span>app/config/grade_rules.py</span> — CBSE grade-level configurations</div>
+          <div class="file"><span>app/config/difficulty_rules.py</span> — Difficulty-level rules</div>
+          <div class="file"><span>app/config/assessment_patterns.py</span> — Standard CBSE assessment patterns</div>
+          <div class="file"><span>app/prompts/science_projects/*.txt</span> — 5 science project prompt templates</div>
+          <div class="file"><span>app/prompts/teacher_assistant/*.txt</span> — 5 teacher assistant prompt templates</div>
+          <div class="file"><span>demo/science_topics.json</span> — 10 seed science topics</div>
+          <div class="file"><span>demo/project_examples.json</span> — 10 project examples</div>
+          <div class="file"><span>demo/assessment_examples.json</span> — 5 assessment examples</div>
+          <div class="file"><span>alembic/versions/86e4f74222dc_*.py</span> — Alembic migration for new tables</div>
+        </div>
+        <p style="margin-top: 16px; color: #475569;"><strong>Modified files:</strong> app/main.py (new routers + Swagger title), app/services/llm/manager.py (lazy provider loading), app/prompts/prompts.json (v3 with new metadata), app/models/__init__.py (new model exports)</p>
+      </div>
+    </div>
+
+    <!-- Swagger -->
+    <h2 style="margin-top: 32px;">📖 Swagger UI</h2>
+    <div class="phase" style="margin-top: 12px;">
+      <div class="phase-body">
+        <p style="color: #64748b;">The API title has been updated to reflect the educational intelligence platform. Access Swagger at:</p>
+        <code style="display: block; background: #f1f5f9; padding: 10px 16px; border-radius: 8px; margin-top: 8px; font-size: 1rem;">
+          http://localhost:8000/docs
+        </code>
+        <p style="margin-top: 12px; color: #475569; font-size: 0.9rem;">
+          Title: <strong>"Toiage Core — Educational Intelligence Platform"</strong> v2.0.0<br>
+          27 routes total including health checks, stories, activities, uploads, and the 8 new educational endpoints.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

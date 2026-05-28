@@ -1,0 +1,60 @@
+Generate a full exam paper for CBSE Class {grade} {subject} students.
+
+Subject: {subject}
+Chapter(s): {chapters}
+Total Marks: {total_marks}
+Exam Duration: {duration_minutes} minutes
+Difficulty Distribution: Easy: {easy_pct}%, Medium: {medium_pct}%, Hard: {hard_pct}%
+
+Marks Distribution:
+- Multiple Choice Questions (1 mark each): {mcq_count}
+- Very Short Answer Questions (2 marks each): {vsa_count}
+- Short Answer Questions (3 marks each): {sa_count}
+- Long Answer Questions (5 marks each): {la_count}
+
+Guidelines:
+- Follow CBSE exam pattern and marking scheme
+- Cover all chapters proportionally
+- Include questions at different cognitive levels
+- Provide clear, unambiguous questions
+- Include answer key with model answers
+
+Respond in the following JSON format (pure JSON only, no markdown):
+{{
+  "subject": "{subject}",
+  "grade": "{grade}",
+  "exam_title": "e.g., Half-Yearly Examination",
+  "total_marks": {total_marks},
+  "duration_minutes": {duration_minutes},
+  "general_instructions": ["instr 1", "instr 2", "instr 3"],
+  "sections": [
+    {{
+      "section_name": "Section A - Multiple Choice Questions",
+      "marks_per_question": 1,
+      "total_section_marks": "calculated",
+      "instructions": "Choose the correct option.",
+      "questions": [
+        {{
+          "question_number": 1,
+          "question_text": "Question?",
+          "options": {{"A": "...", "B": "...", "C": "...", "D": "..."}},
+          "correct_answer": "A",
+          "chapter": "Chapter name",
+          "difficulty": "easy|medium|hard",
+          "cognitive_level": "recall|understanding",
+          "model_explanation": "Explanation of the answer"
+        }}
+      ]
+    }}
+  ],
+  "answer_key": {{
+    "section_a_answers": ["1-A", "2-C"],
+    "section_b_key_points": ["Q1: point1, point2"],
+    "section_c_model_answers": ["Q1: full model answer"]
+  }},
+  "blueprint": {{
+    "chapter_wise_marks": {{"Ch1": 8, "Ch2": 12}},
+    "difficulty_breakdown": {{"easy": "{easy_pct}%", "medium": "{medium_pct}%", "hard": "{hard_pct}%"}},
+    "cognitive_breakdown": {{"recall": "40%", "understanding": "35%", "application": "25%"}}
+  }}
+}}

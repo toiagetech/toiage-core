@@ -1,0 +1,25 @@
+Generate a science project idea for a CBSE Class {grade} student studying {subject}.
+
+Topic: {topic}
+Difficulty Level: {difficulty}
+Budget Constraint: {budget}
+
+The project should be:
+- Hands-on and buildable with commonly available materials in India
+- Aligned with CBSE Class {grade} {subject} curriculum
+- Age-appropriate and safe for students aged {age_range}
+- Completed within a reasonable timeframe
+
+Respond in the following JSON format (NO markdown, NO code fences — pure JSON only):
+{{
+  "project_title": "Title of the project",
+  "subject": "{subject}",
+  "grade": "{grade}",
+  "topic": "{topic}",
+  "difficulty": "{difficulty}",
+  "estimated_build_time": "e.g., 2-3 hours",
+  "estimated_cost": "e.g., ₹150-₹300",
+  "short_description": "2-3 sentence summary of what the student will build",
+  "learning_objectives": ["objective 1", "objective 2", "objective 3"],
+  "curriculum_alignment": "Which chapter/topic in CBSE Class {grade} this matches"
+}}
