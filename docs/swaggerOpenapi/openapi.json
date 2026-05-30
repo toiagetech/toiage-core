@@ -1,0 +1,3170 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Toiage Core — Educational Intelligence Platform",
+    "description": "API for generating curriculum-aligned science projects, assessments, and educational content for CBSE classes 6-8.",
+    "version": "2.0.0"
+  },
+  "paths": {
+    "/ai/test": {
+      "post": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Send raw prompt to LLM",
+        "description": "Send a raw prompt string directly to any configured LLM provider (mock, openrouter, deepseek). Use this for testing provider responses without templates.",
+        "operationId": "test_llm_ai_test_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMGenerateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMGenerateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request (e.g., unknown provider)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/test-template": {
+      "post": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Load prompt template and send to LLM",
+        "description": "Load a prompt template from the prompts/ directory, inject variables, prepend the system prompt (tone/safety rules), and send to an LLM provider. Use this to test prompt templates before integrating into business endpoints.",
+        "operationId": "test_llm_with_template_ai_test_template_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LLMGenerateWithTemplateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LLMGenerateResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Prompt template not found"
+          },
+          "422": {
+            "description": "Missing required template variable"
+          },
+          "400": {
+            "description": "Invalid request (e.g., unknown provider)"
+          }
+        }
+      }
+    },
+    "/stories": {
+      "get": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "List all stories",
+        "description": "Retrieve all stories ordered by creation date (newest first).",
+        "operationId": "list_stories_stories_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StoryRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Stories Stories Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Create a story",
+        "description": "Save a new story to the database. The story content should be generated beforehand via the AI endpoint.",
+        "operationId": "create_story_stories_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error (missing required fields)"
+          }
+        }
+      }
+    },
+    "/stories/{story_id}": {
+      "get": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Get story by ID",
+        "description": "Retrieve a single story by its unique identifier.",
+        "operationId": "get_story_stories__story_id__get",
+        "parameters": [
+          {
+            "name": "story_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Story Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryRead"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Story not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/activities/generate": {
+      "post": {
+        "tags": [
+          "activities"
+        ],
+        "summary": "Generate activity from a story",
+        "description": "Generate a hands-on, educational activity based on a story. Provide either an existing story_id or raw story_text. The activity includes a title, materials list, step-by-step instructions, and an open-ended challenge question. Supports 'household' mode (common items) and 'toy-kit' mode (toys/crafts).",
+        "operationId": "create_activity_activities_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActivityGenerateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityGenerateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request (missing story_id and story_text, or story not found)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/activities/{activity_id}": {
+      "get": {
+        "tags": [
+          "activities"
+        ],
+        "summary": "Get activity by ID",
+        "description": "Retrieve a single generated activity by its unique identifier.",
+        "operationId": "get_activity_activities__activity_id__get",
+        "parameters": [
+          {
+            "name": "activity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Activity Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityRead"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Activity not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/activities": {
+      "get": {
+        "tags": [
+          "activities"
+        ],
+        "summary": "List all activities",
+        "description": "Retrieve all generated activities ordered by creation date (newest first).",
+        "operationId": "list_activities_activities_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Activities Activities Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/uploads/image": {
+      "post": {
+        "tags": [
+          "uploads"
+        ],
+        "summary": "Upload an image",
+        "description": "Upload a child's drawing, artwork, or creative image. Supported formats: JPEG, PNG, WebP, GIF. Max file size: 10MB (configurable via MAX_UPLOAD_SIZE_MB). Returns metadata including the URL for later reflection.",
+        "operationId": "upload_image_uploads_image_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_image_uploads_image_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid file type or file too large"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/uploads/{upload_id}/reflect": {
+      "post": {
+        "tags": [
+          "uploads"
+        ],
+        "summary": "Reflect on an uploaded image",
+        "description": "Generate a warm, encouraging AI reflection on a child's uploaded artwork or creation. The AI describes what it sees positively and asks an open-ended curiosity question. Always age-appropriate, safe, and encouraging.",
+        "operationId": "reflect_on_upload_uploads__upload_id__reflect_post",
+        "parameters": [
+          {
+            "name": "upload_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Upload Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReflectionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReflectionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Upload not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/science-projects/generate": {
+      "post": {
+        "tags": [
+          "science-projects"
+        ],
+        "summary": "Generate a science project",
+        "description": "Generate a complete, curriculum-aligned science project for CBSE classes 6-8. Returns a project with materials list, step-by-step build instructions, scientific explanation, and difficulty assessment. Supports easy, medium, and hard difficulty levels.",
+        "operationId": "generate_science_project_api_v1_science_projects_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScienceProjectGenerateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScienceProjectGenerateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request (unsupported grade, difficulty, or budget)"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/science-projects": {
+      "get": {
+        "tags": [
+          "science-projects"
+        ],
+        "summary": "List all science projects",
+        "description": "Retrieve all generated science projects ordered by creation date (newest first).",
+        "operationId": "list_science_projects_api_v1_science_projects_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScienceProjectGenerateResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Science Projects Api V1 Science Projects Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/science-projects/{project_id}": {
+      "get": {
+        "tags": [
+          "science-projects"
+        ],
+        "summary": "Get science project by ID",
+        "description": "Retrieve a single generated science project by its unique identifier.",
+        "operationId": "get_science_project_api_v1_science_projects__project_id__get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScienceProjectGenerateResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher-assistant/generate": {
+      "post": {
+        "tags": [
+          "teacher-assistant"
+        ],
+        "summary": "Generate assessment with teacher-specified pattern",
+        "description": "Generate a CBSE-aligned assessment where the teacher specifies question types, counts, and marks per question. The pattern is auto-saved for reuse. Supports any question types: mcq, short_answer, long_answer, fill_blanks, true_false, match, etc.",
+        "operationId": "generate_assessment_api_v1_teacher_assistant_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateAssessmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateAssessmentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher-assistant/history": {
+      "get": {
+        "tags": [
+          "teacher-assistant"
+        ],
+        "summary": "List generation history",
+        "description": "Retrieve all past assessment generations ordered by creation date (newest first).",
+        "operationId": "list_generation_history_api_v1_teacher_assistant_history_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response List Generation History Api V1 Teacher Assistant History Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teacher-assistant/history/{history_id}": {
+      "get": {
+        "tags": [
+          "teacher-assistant"
+        ],
+        "summary": "Get generation by ID",
+        "description": "Retrieve a specific generation with full section details.",
+        "operationId": "get_generation_api_v1_teacher_assistant_history__history_id__get",
+        "parameters": [
+          {
+            "name": "history_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "History Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateAssessmentResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Generation not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prototypes": {
+      "post": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Create prototype",
+        "description": "Create a new prototype record.",
+        "operationId": "create_prototype_api_v1_prototypes_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePrototypeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrototypeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "List prototypes",
+        "description": "List prototypes with optional filters.",
+        "operationId": "list_prototypes_api_v1_prototypes_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Status"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "assigned_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Assigned To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PrototypeResponse"
+                  },
+                  "title": "Response List Prototypes Api V1 Prototypes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prototypes/{prototype_id}": {
+      "get": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Get prototype by ID",
+        "description": "Get a single prototype by ID.",
+        "operationId": "get_prototype_api_v1_prototypes__prototype_id__get",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrototypeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prototypes/{prototype_id}/status": {
+      "put": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Update prototype status",
+        "description": "Update the status of a prototype.",
+        "operationId": "update_status_api_v1_prototypes__prototype_id__status_put",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStatusRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrototypeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prototypes/{prototype_id}/photos": {
+      "post": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Upload prototype photo",
+        "description": "Upload a photo for a prototype.",
+        "operationId": "upload_photo_api_v1_prototypes__prototype_id__photos_post",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_photo_api_v1_prototypes__prototype_id__photos_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "List prototype photos",
+        "description": "List all photos for a prototype.",
+        "operationId": "list_photos_api_v1_prototypes__prototype_id__photos_get",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prototypes/{prototype_id}/notes": {
+      "post": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Add prototype note",
+        "description": "Add a text note about a prototype build.",
+        "operationId": "add_note_api_v1_prototypes__prototype_id__notes_post",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddNoteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Get prototype notes",
+        "description": "Get all notes for a prototype.",
+        "operationId": "get_notes_api_v1_prototypes__prototype_id__notes_get",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prototypes/{prototype_id}/materials": {
+      "post": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Add prototype material",
+        "description": "Add a material entry for a prototype.",
+        "operationId": "add_material_api_v1_prototypes__prototype_id__materials_post",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddMaterialRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Get prototype materials",
+        "description": "Get all materials for a prototype.",
+        "operationId": "get_materials_api_v1_prototypes__prototype_id__materials_get",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prototypes/{prototype_id}/cost-sheets": {
+      "post": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Create prototype cost sheet",
+        "description": "Create a cost sheet entry for a prototype.",
+        "operationId": "create_cost_sheet_api_v1_prototypes__prototype_id__cost_sheets_post",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCostSheetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Get prototype cost sheets",
+        "description": "Get all cost sheets for a prototype.",
+        "operationId": "get_cost_sheets_api_v1_prototypes__prototype_id__cost_sheets_get",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/prototypes/{prototype_id}/build-records": {
+      "post": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Create prototype build record",
+        "description": "Create a build record for a prototype.",
+        "operationId": "create_build_record_api_v1_prototypes__prototype_id__build_records_post",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddBuildRecordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "prototype-management"
+        ],
+        "summary": "Get prototype build records",
+        "description": "Get all build records for a prototype.",
+        "operationId": "get_build_records_api_v1_prototypes__prototype_id__build_records_get",
+        "parameters": [
+          {
+            "name": "prototype_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Prototype Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/db-health": {
+      "get": {
+        "summary": "Db Health",
+        "operationId": "db_health_db_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActivityGenerateRequest": {
+        "properties": {
+          "story_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Story Id",
+            "description": "ID of an existing story to base activity on",
+            "examples": [1]
+          },
+          "story_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Story Text",
+            "description": "Story text to base activity on (use when story_id not provided)",
+            "examples": [
+              "The brave rabbit explored the magical forest..."
+            ]
+          },
+          "age_group": {
+            "type": "string",
+            "title": "Age Group",
+            "description": "Target age group for the activity",
+            "examples": [
+              "3-5",
+              "6-8"
+            ]
+          },
+          "activity_mode": {
+            "type": "string",
+            "title": "Activity Mode",
+            "description": "Activity mode: 'household' uses common items, 'toy-kit' uses toys/crafts",
+            "default": "household",
+            "examples": [
+              "household",
+              "toy-kit"
+            ]
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "description": "LLM provider: mock, openrouter, or deepseek",
+            "default": "mock",
+            "examples": [
+              "mock",
+              "openrouter"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "age_group"
+        ],
+        "title": "ActivityGenerateRequest",
+        "description": "Request to generate a hands-on activity from a story."
+      },
+      "ActivityGenerateResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique activity identifier",
+            "examples": [1]
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Activity title",
+            "examples": [
+              "Magical Forest Diorama"
+            ]
+          },
+          "materials": {
+            "type": "string",
+            "title": "Materials",
+            "description": "List of materials needed",
+            "examples": [
+              "- A shoebox\n- Colored paper\n- Glue\n- Scissors"
+            ]
+          },
+          "instructions": {
+            "type": "string",
+            "title": "Instructions",
+            "description": "Step-by-step instructions",
+            "examples": [
+              "1. Paint the shoebox...\n2. Cut shapes..."
+            ]
+          },
+          "challenge_question": {
+            "type": "string",
+            "title": "Challenge Question",
+            "description": "Open-ended question to encourage creativity",
+            "examples": [
+              "What magical creature would you add?"
+            ]
+          },
+          "age_group": {
+            "type": "string",
+            "title": "Age Group",
+            "description": "Target age group",
+            "examples": [
+              "3-5"
+            ]
+          },
+          "activity_mode": {
+            "type": "string",
+            "title": "Activity Mode",
+            "description": "Activity mode",
+            "default": "household",
+            "examples": [
+              "household"
+            ]
+          },
+          "story_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Story Id",
+            "description": "Source story ID if generated from an existing story",
+            "examples": [1]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "When the activity was created"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "materials",
+          "instructions",
+          "challenge_question",
+          "age_group",
+          "created_at"
+        ],
+        "title": "ActivityGenerateResponse",
+        "description": "A generated activity with structured fields.",
+        "examples": [
+          {
+            "activity_mode": "household",
+            "age_group": "3-5",
+            "challenge_question": "What magical creature would you add to your forest?",
+            "created_at": "2026-05-22T10:00:00Z",
+            "id": 1,
+            "instructions": "1. Paint the inside of the shoebox blue for the sky.\n2. Cut tree shapes and glue them inside.",
+            "materials": "- A shoebox or small cardboard box\n- Colored paper (green, brown, blue)\n- Glue",
+            "story_id": 1,
+            "title": "Magical Forest Diorama"
+          }
+        ]
+      },
+      "ActivityRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique activity identifier",
+            "examples": [1]
+          },
+          "story_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Story Id",
+            "description": "Source story ID",
+            "examples": [1]
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Activity title"
+          },
+          "materials": {
+            "type": "string",
+            "title": "Materials",
+            "description": "List of materials"
+          },
+          "instructions": {
+            "type": "string",
+            "title": "Instructions",
+            "description": "Step-by-step instructions"
+          },
+          "challenge_question": {
+            "type": "string",
+            "title": "Challenge Question",
+            "description": "Open-ended challenge question"
+          },
+          "age_group": {
+            "type": "string",
+            "title": "Age Group",
+            "description": "Target age group"
+          },
+          "activity_mode": {
+            "type": "string",
+            "title": "Activity Mode",
+            "description": "Activity mode",
+            "default": "household"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "When the activity was created"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "materials",
+          "instructions",
+          "challenge_question",
+          "age_group",
+          "created_at"
+        ],
+        "title": "ActivityRead",
+        "description": "An existing activity with metadata (read-only)."
+      },
+      "AddBuildRecordRequest": {
+        "properties": {
+          "hours_spent": {
+            "type": "number",
+            "title": "Hours Spent",
+            "description": "Hours spent building",
+            "default": 0
+          },
+          "travel_cost": {
+            "type": "number",
+            "title": "Travel Cost",
+            "description": "Travel expenses",
+            "default": 0
+          },
+          "build_date": {
+            "type": "string",
+            "title": "Build Date",
+            "description": "Date of build",
+            "default": "",
+            "examples": [
+              "2026-05-30"
+            ]
+          }
+        },
+        "type": "object",
+        "title": "AddBuildRecordRequest"
+      },
+      "AddCostSheetRequest": {
+        "properties": {
+          "items": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Items",
+            "description": "Cost items (name, cost)"
+          },
+          "total_estimated_cost_rs": {
+            "type": "number",
+            "title": "Total Estimated Cost Rs",
+            "default": 0
+          },
+          "total_actual_cost_rs": {
+            "type": "number",
+            "title": "Total Actual Cost Rs",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "AddCostSheetRequest"
+      },
+      "AddMaterialRequest": {
+        "properties": {
+          "material": {
+            "type": "string",
+            "title": "Material",
+            "description": "Material name",
+            "examples": [
+              "Cardboard"
+            ]
+          },
+          "quantity": {
+            "type": "number",
+            "title": "Quantity",
+            "description": "Quantity",
+            "default": 1
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit",
+            "description": "Unit",
+            "default": "piece",
+            "examples": [
+              "sheet",
+              "meter",
+              "piece"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "material"
+        ],
+        "title": "AddMaterialRequest"
+      },
+      "AddNoteRequest": {
+        "properties": {
+          "note": {
+            "type": "string",
+            "title": "Note",
+            "description": "Note content",
+            "examples": [
+              "Cardboard bends under weight"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "note"
+        ],
+        "title": "AddNoteRequest"
+      },
+      "Body_upload_image_uploads_image_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_image_uploads_image_post"
+      },
+      "Body_upload_photo_api_v1_prototypes__prototype_id__photos_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_photo_api_v1_prototypes__prototype_id__photos_post"
+      },
+      "BuildStep": {
+        "properties": {
+          "step_number": {
+            "type": "integer",
+            "title": "Step Number",
+            "description": "Step number",
+            "examples": [1]
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Step title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Detailed step description"
+          },
+          "estimated_time_minutes": {
+            "type": "integer",
+            "title": "Estimated Time Minutes",
+            "description": "Estimated time for this step",
+            "examples": [15]
+          },
+          "materials_needed": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Materials Needed",
+            "description": "Materials needed for this step"
+          },
+          "safety_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Safety Note",
+            "description": "Safety precaution for this step"
+          }
+        },
+        "type": "object",
+        "required": [
+          "step_number",
+          "title",
+          "description",
+          "estimated_time_minutes"
+        ],
+        "title": "BuildStep",
+        "description": "A single build step for a project."
+      },
+      "CreatePrototypeRequest": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id",
+            "description": "Reference to the science project",
+            "default": ""
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Prototype name",
+            "examples": [
+              "Hydraulic Bridge V1"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "description": "Description of the prototype",
+            "default": ""
+          },
+          "assigned_to": {
+            "type": "string",
+            "title": "Assigned To",
+            "description": "Who is building this",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "CreatePrototypeRequest"
+      },
+      "ExamSection": {
+        "properties": {
+          "section_name": {
+            "type": "string",
+            "title": "Section Name",
+            "description": "Section name"
+          },
+          "marks_per_question": {
+            "type": "integer",
+            "title": "Marks Per Question",
+            "description": "Marks per question"
+          },
+          "total_section_marks": {
+            "type": "integer",
+            "title": "Total Section Marks",
+            "description": "Total marks for this section"
+          },
+          "instructions": {
+            "type": "string",
+            "title": "Instructions",
+            "description": "Section instructions"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            },
+            "type": "array",
+            "title": "Questions",
+            "description": "Questions in this section"
+          }
+        },
+        "type": "object",
+        "required": [
+          "section_name",
+          "marks_per_question",
+          "total_section_marks",
+          "instructions"
+        ],
+        "title": "ExamSection",
+        "description": "A section of an exam paper."
+      },
+      "GenerateAssessmentRequest": {
+        "properties": {
+          "grade": {
+            "type": "integer",
+            "title": "Grade",
+            "description": "CBSE class grade",
+            "examples": [6]
+          },
+          "subject": {
+            "type": "string",
+            "title": "Subject",
+            "description": "Subject name",
+            "examples": [
+              "Science"
+            ]
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter",
+            "description": "Chapter name",
+            "examples": [
+              "Water"
+            ]
+          },
+          "topic": {
+            "type": "string",
+            "title": "Topic",
+            "description": "Topic",
+            "default": "",
+            "examples": [
+              "Water Conservation"
+            ]
+          },
+          "question_specs": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionSpecItem"
+            },
+            "type": "array",
+            "title": "Question Specs",
+            "description": "List of question type specifications"
+          },
+          "pattern_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pattern Name",
+            "description": "Optional name to save this pattern as. Auto-generated if not provided.",
+            "examples": [
+              "Class 6 Science Annual"
+            ]
+          },
+          "duration_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Minutes",
+            "description": "Recommended duration in minutes"
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty",
+            "default": "medium"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "default": "mock"
+          }
+        },
+        "type": "object",
+        "required": [
+          "grade",
+          "subject",
+          "chapter",
+          "question_specs"
+        ],
+        "title": "GenerateAssessmentRequest",
+        "description": "Request to generate a custom assessment — replaces all previous specific endpoints."
+      },
+      "GenerateAssessmentResponse": {
+        "properties": {
+          "subject": {
+            "type": "string",
+            "title": "Subject",
+            "description": "Subject name"
+          },
+          "grade": {
+            "type": "integer",
+            "title": "Grade",
+            "description": "CBSE class grade"
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter",
+            "description": "Chapter name"
+          },
+          "topic": {
+            "type": "string",
+            "title": "Topic",
+            "description": "Topic"
+          },
+          "total_marks": {
+            "type": "integer",
+            "title": "Total Marks",
+            "description": "Total marks"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/ExamSection"
+            },
+            "type": "array",
+            "title": "Sections",
+            "description": "Assessment sections"
+          },
+          "total_time_minutes": {
+            "type": "string",
+            "title": "Total Time Minutes",
+            "description": "Recommended time"
+          },
+          "instructions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Instructions",
+            "description": "General instructions"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "description": "Generation history ID",
+            "examples": [42]
+          },
+          "pattern_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pattern Id",
+            "description": "Saved pattern ID",
+            "examples": [5]
+          },
+          "pattern_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pattern Name",
+            "description": "Name of the saved pattern"
+          }
+        },
+        "type": "object",
+        "required": [
+          "subject",
+          "grade",
+          "chapter",
+          "topic",
+          "total_marks",
+          "total_time_minutes"
+        ],
+        "title": "GenerateAssessmentResponse",
+        "description": "Response for assessment generation — includes IDs for pattern and generation history."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LLMGenerateRequest": {
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "title": "Prompt",
+            "description": "The prompt text to send to the LLM",
+            "examples": [
+              "Write a short story about a brave rabbit"
+            ]
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "description": "LLM provider: mock, openrouter, or deepseek",
+            "default": "mock",
+            "examples": [
+              "mock",
+              "openrouter"
+            ]
+          },
+          "temperature": {
+            "type": "number",
+            "maximum": 2,
+            "minimum": 0,
+            "title": "Temperature",
+            "description": "Sampling temperature (0.0-2.0)",
+            "default": 0.7,
+            "examples": [0.7, 1]
+          },
+          "max_tokens": {
+            "type": "integer",
+            "maximum": 8192,
+            "minimum": 1,
+            "title": "Max Tokens",
+            "description": "Maximum tokens in the response",
+            "default": 1024,
+            "examples": [100, 1024]
+          }
+        },
+        "type": "object",
+        "required": [
+          "prompt"
+        ],
+        "title": "LLMGenerateRequest",
+        "description": "Request to send a raw prompt to an LLM provider."
+      },
+      "LLMGenerateResponse": {
+        "properties": {
+          "response": {
+            "type": "string",
+            "title": "Response",
+            "description": "The generated text from the LLM",
+            "examples": [
+              "Once upon a time..."
+            ]
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "description": "The provider that generated the response",
+            "examples": [
+              "mock",
+              "openrouter"
+            ]
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "The model that generated the response",
+            "examples": [
+              "mock-model-v1",
+              "google/gemini-2.0-flash-001"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "response",
+          "provider",
+          "model"
+        ],
+        "title": "LLMGenerateResponse",
+        "description": "Response from an LLM provider.",
+        "examples": [
+          {
+            "model": "mock-model-v1",
+            "provider": "mock",
+            "response": "Hello little explorer!"
+          }
+        ]
+      },
+      "LLMGenerateWithTemplateRequest": {
+        "properties": {
+          "template_category": {
+            "type": "string",
+            "title": "Template Category",
+            "description": "Prompt category directory (e.g. stories, activities, reflections)",
+            "examples": [
+              "stories",
+              "activities"
+            ]
+          },
+          "template_name": {
+            "type": "string",
+            "title": "Template Name",
+            "description": "Template filename without extension (e.g. create, generate, image)",
+            "examples": [
+              "create",
+              "generate"
+            ]
+          },
+          "variables": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Variables",
+            "description": "Template variable values for {variable} substitution",
+            "examples": [
+              {
+                "age": "5",
+                "child_name": "Aria",
+                "setting": "forest",
+                "theme": "friendship",
+                "word_count": "100"
+              }
+            ]
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "description": "LLM provider: mock, openrouter, or deepseek",
+            "default": "mock",
+            "examples": [
+              "mock",
+              "openrouter"
+            ]
+          },
+          "temperature": {
+            "type": "number",
+            "maximum": 2,
+            "minimum": 0,
+            "title": "Temperature",
+            "description": "Sampling temperature (0.0-2.0)",
+            "default": 0.7
+          },
+          "max_tokens": {
+            "type": "integer",
+            "maximum": 8192,
+            "minimum": 1,
+            "title": "Max Tokens",
+            "description": "Maximum tokens in the response",
+            "default": 1024
+          }
+        },
+        "type": "object",
+        "required": [
+          "template_category",
+          "template_name"
+        ],
+        "title": "LLMGenerateWithTemplateRequest",
+        "description": "Request to load a prompt template, inject variables, and send to an LLM."
+      },
+      "MCQOption": {
+        "properties": {
+          "A": {
+            "type": "string",
+            "title": "A",
+            "description": "Option A"
+          },
+          "B": {
+            "type": "string",
+            "title": "B",
+            "description": "Option B"
+          },
+          "C": {
+            "type": "string",
+            "title": "C",
+            "description": "Option C"
+          },
+          "D": {
+            "type": "string",
+            "title": "D",
+            "description": "Option D"
+          }
+        },
+        "type": "object",
+        "required": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ],
+        "title": "MCQOption",
+        "description": "Options for a multiple-choice question."
+      },
+      "MaterialItem": {
+        "properties": {
+          "item": {
+            "type": "string",
+            "title": "Item",
+            "description": "Name of the item"
+          },
+          "quantity": {
+            "type": "string",
+            "title": "Quantity",
+            "description": "Quantity needed",
+            "examples": [
+              "2"
+            ]
+          },
+          "unit": {
+            "type": "string",
+            "title": "Unit",
+            "description": "Unit of measurement",
+            "examples": [
+              "pieces",
+              "meters",
+              "liters"
+            ]
+          },
+          "estimated_cost_rs": {
+            "type": "number",
+            "title": "Estimated Cost Rs",
+            "description": "Estimated cost in rupees",
+            "examples": [50]
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "Where to source the item",
+            "examples": [
+              "Kitchen",
+              "Stationery shop"
+            ]
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes",
+            "description": "Optional notes about the item"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item",
+          "quantity",
+          "unit",
+          "estimated_cost_rs",
+          "source"
+        ],
+        "title": "MaterialItem",
+        "description": "A single material item for a project."
+      },
+      "PrototypeResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "assigned_to": {
+            "type": "string",
+            "title": "Assigned To"
+          },
+          "total_cost_rs": {
+            "type": "number",
+            "title": "Total Cost Rs"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "name",
+          "description",
+          "status",
+          "assigned_to",
+          "total_cost_rs",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "PrototypeResponse"
+      },
+      "Question": {
+        "properties": {
+          "question_number": {
+            "type": "integer",
+            "title": "Question Number",
+            "description": "Question number"
+          },
+          "question_text": {
+            "type": "string",
+            "title": "Question Text",
+            "description": "Question text"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MCQOption"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Options for MCQ"
+          },
+          "correct_answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct Answer",
+            "description": "Correct answer"
+          },
+          "marks": {
+            "type": "integer",
+            "title": "Marks",
+            "description": "Marks for this question",
+            "default": 1
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty",
+            "description": "Difficulty level",
+            "default": "medium"
+          },
+          "cognitive_level": {
+            "type": "string",
+            "title": "Cognitive Level",
+            "description": "Cognitive level",
+            "default": "recall"
+          },
+          "chapter": {
+            "type": "string",
+            "title": "Chapter",
+            "description": "Chapter name",
+            "default": ""
+          },
+          "model_explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Explanation",
+            "description": "Explanation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question_number",
+          "question_text"
+        ],
+        "title": "Question",
+        "description": "A generic question (for exam papers)."
+      },
+      "QuestionSpecItem": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "description": "Question type: mcq, short_answer, long_answer, fill_blanks, true_false, match, etc.",
+            "examples": [
+              "mcq",
+              "short_answer",
+              "long_answer"
+            ]
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count",
+            "description": "Number of questions of this type",
+            "examples": [5]
+          },
+          "marks_per_question": {
+            "type": "integer",
+            "title": "Marks Per Question",
+            "description": "Marks per question",
+            "examples": [1, 2, 3, 5]
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty",
+            "description": "Difficulty for this section",
+            "default": "medium"
+          },
+          "cognitive_levels": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cognitive Levels",
+            "description": "Cognitive levels to cover"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "count",
+          "marks_per_question"
+        ],
+        "title": "QuestionSpecItem",
+        "description": "Specification for a single question type in an assessment."
+      },
+      "ReflectionRequest": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "description": "LLM provider for reflection: mock, openrouter, or deepseek",
+            "default": "mock",
+            "examples": [
+              "mock",
+              "openrouter"
+            ]
+          }
+        },
+        "type": "object",
+        "title": "ReflectionRequest",
+        "description": "Request to generate an AI reflection on an uploaded image."
+      },
+      "ReflectionResponse": {
+        "properties": {
+          "upload_id": {
+            "type": "integer",
+            "title": "Upload Id",
+            "description": "ID of the upload being reflected on",
+            "examples": [1]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Warm, encouraging reflection message from the AI",
+            "examples": [
+              "What a wonderful and colorful creation! I love how you used so many bright colors..."
+            ]
+          },
+          "curiosity_question": {
+            "type": "string",
+            "title": "Curiosity Question",
+            "description": "Optional follow-up question to encourage creativity",
+            "default": "",
+            "examples": [
+              "What would you add to this picture if you could imagine anything?"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "upload_id",
+          "message"
+        ],
+        "title": "ReflectionResponse",
+        "description": "AI-generated reflection on a child's artwork.",
+        "examples": [
+          {
+            "curiosity_question": "What would you add to this picture?",
+            "message": "What a wonderful and colorful creation! I love how you used so many bright colors...",
+            "upload_id": 1
+          }
+        ]
+      },
+      "ScienceProjectGenerateRequest": {
+        "properties": {
+          "grade": {
+            "type": "integer",
+            "title": "Grade",
+            "description": "CBSE class grade (6, 7, or 8)",
+            "examples": [6]
+          },
+          "subject": {
+            "type": "string",
+            "title": "Subject",
+            "description": "Subject name",
+            "examples": [
+              "Science",
+              "Physics",
+              "Chemistry",
+              "Biology"
+            ]
+          },
+          "topic": {
+            "type": "string",
+            "title": "Topic",
+            "description": "Topic for the project",
+            "examples": [
+              "Water Conservation",
+              "Solar Energy"
+            ]
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty",
+            "description": "Difficulty level: easy, medium, or hard",
+            "default": "medium",
+            "examples": [
+              "medium"
+            ]
+          },
+          "budget": {
+            "type": "string",
+            "title": "Budget",
+            "description": "Budget constraint: low, medium, or high",
+            "default": "low",
+            "examples": [
+              "low"
+            ]
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "description": "LLM provider: mock, openrouter, or deepseek",
+            "default": "mock",
+            "examples": [
+              "mock"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "grade",
+          "subject",
+          "topic"
+        ],
+        "title": "ScienceProjectGenerateRequest",
+        "description": "Request to generate a science project."
+      },
+      "ScienceProjectGenerateResponse": {
+        "properties": {
+          "project": {
+            "$ref": "#/components/schemas/ScienceProjectResponse",
+            "description": "The generated science project"
+          },
+          "project_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Id",
+            "description": "Database record ID",
+            "examples": [1]
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At",
+            "description": "When the project was created"
+          },
+          "prompt_tokens_used": {
+            "type": "integer",
+            "title": "Prompt Tokens Used",
+            "description": "LLM prompt tokens used",
+            "default": 0
+          },
+          "completion_tokens_used": {
+            "type": "integer",
+            "title": "Completion Tokens Used",
+            "description": "LLM completion tokens used",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "project"
+        ],
+        "title": "ScienceProjectGenerateResponse",
+        "description": "Response wrapper for science project generation."
+      },
+      "ScienceProjectResponse": {
+        "properties": {
+          "project_title": {
+            "type": "string",
+            "title": "Project Title",
+            "description": "Title of the project"
+          },
+          "subject": {
+            "type": "string",
+            "title": "Subject",
+            "description": "Subject name"
+          },
+          "grade": {
+            "type": "integer",
+            "title": "Grade",
+            "description": "CBSE class grade",
+            "examples": [6]
+          },
+          "topic": {
+            "type": "string",
+            "title": "Topic",
+            "description": "Topic covered"
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty",
+            "description": "Difficulty level"
+          },
+          "estimated_build_time": {
+            "type": "string",
+            "title": "Estimated Build Time",
+            "description": "Estimated time to complete",
+            "examples": [
+              "2-3 hours"
+            ]
+          },
+          "estimated_cost": {
+            "type": "string",
+            "title": "Estimated Cost",
+            "description": "Estimated cost range",
+            "examples": [
+              "₹150-₹300"
+            ]
+          },
+          "short_description": {
+            "type": "string",
+            "title": "Short Description",
+            "description": "Brief summary of the project"
+          },
+          "learning_objectives": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Learning Objectives",
+            "description": "Learning objectives"
+          },
+          "curriculum_alignment": {
+            "type": "string",
+            "title": "Curriculum Alignment",
+            "description": "CBSE curriculum alignment"
+          },
+          "materials": {
+            "items": {
+              "$ref": "#/components/schemas/MaterialItem"
+            },
+            "type": "array",
+            "title": "Materials",
+            "description": "Materials needed"
+          },
+          "total_estimated_cost_rs": {
+            "type": "number",
+            "title": "Total Estimated Cost Rs",
+            "description": "Total estimated cost in rupees",
+            "default": 0
+          },
+          "safety_items_required": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Safety Items Required",
+            "description": "Safety items needed"
+          },
+          "alternative_materials": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Alternative Materials",
+            "description": "Alternative material options"
+          },
+          "total_steps": {
+            "type": "integer",
+            "title": "Total Steps",
+            "description": "Total number of build steps",
+            "default": 0
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/BuildStep"
+            },
+            "type": "array",
+            "title": "Steps",
+            "description": "Step-by-step build instructions"
+          },
+          "precautions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Precautions",
+            "description": "Safety precautions"
+          },
+          "adult_supervision_required": {
+            "type": "boolean",
+            "title": "Adult Supervision Required",
+            "description": "Whether adult supervision is needed",
+            "default": true
+          },
+          "tips_for_success": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tips For Success",
+            "description": "Tips for successful completion"
+          },
+          "scientific_principle": {
+            "type": "string",
+            "title": "Scientific Principle",
+            "description": "Scientific principle demonstrated",
+            "default": ""
+          },
+          "simple_explanation": {
+            "type": "string",
+            "title": "Simple Explanation",
+            "description": "Age-appropriate explanation",
+            "default": ""
+          },
+          "how_project_demonstrates": {
+            "type": "string",
+            "title": "How Project Demonstrates",
+            "description": "How the project demonstrates the principle",
+            "default": ""
+          },
+          "real_world_applications": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Real World Applications",
+            "description": "Real-world applications"
+          },
+          "simple_analogy": {
+            "type": "string",
+            "title": "Simple Analogy",
+            "description": "Relatable analogy for the student",
+            "default": ""
+          },
+          "overall_difficulty": {
+            "type": "string",
+            "title": "Overall Difficulty",
+            "description": "Overall difficulty assessment",
+            "default": "medium"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "description": "LLM provider used",
+            "default": "mock"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_title",
+          "subject",
+          "grade",
+          "topic",
+          "difficulty",
+          "estimated_build_time",
+          "estimated_cost",
+          "short_description",
+          "curriculum_alignment"
+        ],
+        "title": "ScienceProjectResponse",
+        "description": "A generated science project with full details.",
+        "examples": [
+          {
+            "curriculum_alignment": "CBSE Class 6 Science: Water",
+            "difficulty": "medium",
+            "estimated_build_time": "2-3 hours",
+            "estimated_cost": "₹150-₹300",
+            "grade": 6,
+            "learning_objectives": [
+              "Understand water conservation",
+              "Learn about rainwater harvesting"
+            ],
+            "overall_difficulty": "medium",
+            "project_title": "Working Model of Rainwater Harvesting",
+            "provider": "mock",
+            "short_description": "Build a working model demonstrating rainwater harvesting techniques.",
+            "subject": "Science",
+            "topic": "Water Conservation"
+          }
+        ]
+      },
+      "StoryCreate": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "The story text content",
+            "examples": [
+              "Once upon a time, in a magical forest..."
+            ]
+          },
+          "age_group": {
+            "type": "string",
+            "title": "Age Group",
+            "description": "Target age group for the story",
+            "examples": [
+              "3-5",
+              "6-8",
+              "9-12"
+            ]
+          },
+          "theme": {
+            "type": "string",
+            "title": "Theme",
+            "description": "Story theme",
+            "examples": [
+              "friendship",
+              "adventure",
+              "kindness"
+            ]
+          },
+          "skills": {
+            "type": "string",
+            "title": "Skills",
+            "description": "Skills developed by this story (comma-separated)",
+            "default": "",
+            "examples": [
+              "reading",
+              "empathy",
+              "creativity"
+            ]
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty",
+            "description": "Reading difficulty level",
+            "default": "beginner",
+            "examples": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "content",
+          "age_group",
+          "theme"
+        ],
+        "title": "StoryCreate",
+        "description": "Request to create a new story."
+      },
+      "StoryRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique story identifier",
+            "examples": [1]
+          },
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "The story text content"
+          },
+          "age_group": {
+            "type": "string",
+            "title": "Age Group",
+            "description": "Target age group",
+            "examples": [
+              "3-5"
+            ]
+          },
+          "theme": {
+            "type": "string",
+            "title": "Theme",
+            "description": "Story theme",
+            "examples": [
+              "friendship"
+            ]
+          },
+          "skills": {
+            "type": "string",
+            "title": "Skills",
+            "description": "Skills developed",
+            "default": ""
+          },
+          "difficulty": {
+            "type": "string",
+            "title": "Difficulty",
+            "description": "Reading difficulty",
+            "default": "beginner"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "When the story was created"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "content",
+          "age_group",
+          "theme",
+          "created_at"
+        ],
+        "title": "StoryRead",
+        "description": "A saved story with metadata.",
+        "examples": [
+          {
+            "age_group": "3-5",
+            "content": "Once upon a time...",
+            "created_at": "2026-05-22T10:00:00Z",
+            "difficulty": "beginner",
+            "id": 1,
+            "skills": "reading, empathy",
+            "theme": "friendship"
+          }
+        ]
+      },
+      "UpdateStatusRequest": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "New status",
+            "examples": [
+              "IN_PROGRESS"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "UpdateStatusRequest"
+      },
+      "UploadResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique upload identifier",
+            "examples": [1]
+          },
+          "filename": {
+            "type": "string",
+            "title": "Filename",
+            "description": "UUID-based filename on disk",
+            "examples": [
+              "a1b2c3d4-e5f6-7890-abcd-ef1234567890.png"
+            ]
+          },
+          "original_name": {
+            "type": "string",
+            "title": "Original Name",
+            "description": "Original filename from upload",
+            "examples": [
+              "my_drawing.png"
+            ]
+          },
+          "file_size": {
+            "type": "integer",
+            "title": "File Size",
+            "description": "File size in bytes",
+            "examples": [8632]
+          },
+          "mime_type": {
+            "type": "string",
+            "title": "Mime Type",
+            "description": "MIME type of the image",
+            "examples": [
+              "image/png",
+              "image/jpeg"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "title": "Url",
+            "description": "URL to access the uploaded image",
+            "examples": [
+              "/uploads/files/a1b2c3d4e5f6.png"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "When the upload was created"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "filename",
+          "original_name",
+          "file_size",
+          "mime_type",
+          "url",
+          "created_at"
+        ],
+        "title": "UploadResponse",
+        "description": "Metadata for an uploaded image.",
+        "examples": [
+          {
+            "created_at": "2026-05-22T10:00:00Z",
+            "file_size": 8632,
+            "filename": "a1b2c3d4e5f6.png",
+            "id": 1,
+            "mime_type": "image/png",
+            "original_name": "my_drawing.png",
+            "url": "/uploads/files/a1b2c3d4e5f6.png"
+          }
+        ]
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

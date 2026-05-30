@@ -10,7 +10,7 @@ from app.api.stories import router as stories_router
 from app.api.uploads import router as uploads_router
 from app.api.science_projects import router as science_projects_router
 from app.api.teacher_assistant import router as teacher_assistant_router
-from app.api.prototype_docs import router as prototype_docs_router
+from app.api.prototype_management import router as prototype_management_router
 from app.core.config import settings
 from app.db.session import engine
 from app.utils.exceptions import global_exception_handler, http_exception_handler
@@ -45,7 +45,7 @@ app.include_router(activities_router)
 app.include_router(uploads_router)
 app.include_router(science_projects_router)
 app.include_router(teacher_assistant_router)
-app.include_router(prototype_docs_router)
+app.include_router(prototype_management_router)
 
 # Mount uploads directory for serving uploaded files
 uploads_path = Path(settings.UPLOAD_DIR)

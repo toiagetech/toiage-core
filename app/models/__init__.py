@@ -5,6 +5,8 @@ from app.models.curriculum import CurriculumMaster
 from app.models.project_metadata import ProjectMetadataConfig
 from app.models.assessment_pattern import AssessmentConfig
 from app.models.project_record import ScienceProjectRecord
+from app.models.generation_history import AssessmentGenerationHistory
+from app.models.prototype_master import PrototypeMaster
 
 __all__ = [
     "Activity",
@@ -14,4 +16,6 @@ __all__ = [
     "ProjectMetadataConfig",
     "AssessmentConfig",
     "ScienceProjectRecord",
+    "AssessmentGenerationHistory",
+    "PrototypeMaster",
 ]

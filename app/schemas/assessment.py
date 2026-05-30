@@ -134,23 +134,40 @@ class LongAnswerGenerateRequest(BaseModel):
 
 
 class QuestionSpecItem(BaseModel):
-    """Specification for a single question type in a custom assessment."""
-    type: str = Field(..., description="Question type: mcq, short_answer, or long_answer", examples=["mcq", "short_answer", "long_answer"])
+    """Specification for a single question type in an assessment."""
+    type: str = Field(..., description="Question type: mcq, short_answer, long_answer, fill_blanks, true_false, match, etc.", examples=["mcq", "short_answer", "long_answer"])
     count: int = Field(..., description="Number of questions of this type", examples=[5])
     marks_per_question: int = Field(..., description="Marks per question", examples=[1, 2, 3, 5])
     difficulty: str = Field(default="medium", description="Difficulty for this section")
     cognitive_levels: list[str] | None = Field(default=None, description="Cognitive levels to cover")
 
 
-class CustomAssessmentGenerateRequest(BaseModel):
-    """Request to generate a custom assessment with teacher-specified question types."""
+class GenerateAssessmentRequest(BaseModel):
+    """Request to generate a custom assessment — replaces all previous specific endpoints."""
     grade: int = Field(..., description="CBSE class grade", examples=[6])
     subject: str = Field(..., description="Subject name", examples=["Science"])
     chapter: str = Field(..., description="Chapter name", examples=["Water"])
-    topic: str = Field(..., description="Topic", examples=["Water Conservation"])
+    topic: str = Field(default="", description="Topic", examples=["Water Conservation"])
     question_specs: list[QuestionSpecItem] = Field(..., description="List of question type specifications")
+    pattern_name: str | None = Field(default=None, description="Optional name to save this pattern as. Auto-generated if not provided.", examples=["Class 6 Science Annual"])
+    duration_minutes: int | None = Field(default=None, description="Recommended duration in minutes")
     difficulty: str = Field(default="medium")
     provider: str = Field(default="mock")
+
+
+class GenerateAssessmentResponse(BaseModel):
+    """Response for assessment generation — includes IDs for pattern and generation history."""
+    subject: str = Field(..., description="Subject name")
+    grade: int = Field(..., description="CBSE class grade")
+    chapter: str = Field(..., description="Chapter name")
+    topic: str = Field(..., description="Topic")
+    total_marks: int = Field(..., description="Total marks")
+    sections: list[ExamSection] = Field(default_factory=list, description="Assessment sections")
+    total_time_minutes: str = Field(..., description="Recommended time")
+    instructions: list[str] = Field(default_factory=list, description="General instructions")
+    id: int | None = Field(default=None, description="Generation history ID", examples=[42])
+    pattern_id: int | None = Field(default=None, description="Saved pattern ID", examples=[5])
+    pattern_name: str | None = Field(default=None, description="Name of the saved pattern")
 
 
 class WorksheetGenerateRequest(BaseModel):
