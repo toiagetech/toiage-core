@@ -4,6 +4,8 @@ Chapter: {chapter}
 Topic: {topic}
 Difficulty Level: {difficulty}
 
+{educational_context}
+
 The teacher has specified the following question types and marks distribution:
 
 {question_specs}

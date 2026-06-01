@@ -8,6 +8,7 @@ from app.schemas.assessment import (
     Question,
     ExamSection,
 )
+from app.services.education_engine import fetch_assessment_context, _format_context_for_prompt
 from app.services.orchestration.pipeline_runner import orchestrator
 from app.utils.logger import get_logger
 
@@ -45,6 +46,15 @@ class TeacherAssistantService:
             extra={"grade": body.grade, "subject": body.subject, "chapter": body.chapter, "total_marks": total_marks},
         )
 
+        # Fetch educational context from engine
+        context_data = await fetch_assessment_context(
+            grade=body.grade,
+            subject=body.subject,
+            chapter=body.chapter,
+        )
+        context_prompt = _format_context_for_prompt(context_data, context_type="assessment")
+        logger.info("Assessment context fetched", extra={"counts": context_data.get("counts", {})})
+
         raw = await orchestrator.execute_with_retry(
             category="teacher_assistant",
             prompt_name="custom_assessment",
@@ -55,6 +65,7 @@ class TeacherAssistantService:
                 "topic": body.topic or body.chapter,
                 "difficulty": body.difficulty,
                 "question_specs": question_specs_str,
+                "educational_context": context_prompt,
             },
             provider=body.provider,
             max_tokens=4096,
