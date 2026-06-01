@@ -6,6 +6,7 @@ from app.schemas.science_project import (
     ScienceProjectGenerateRequest,
     ScienceProjectResponse,
 )
+from app.services.education_engine import fetch_project_context, _format_context_for_prompt
 from app.services.orchestration.pipeline_runner import orchestrator
 from app.utils.logger import get_logger
 
@@ -41,6 +42,16 @@ class ScienceProjectService:
         _validate_request(body)
 
         age_range = GRADE_AGE_MAP[body.grade]
+
+        # Fetch educational context from engine
+        context_data = await fetch_project_context(
+            grade=body.grade,
+            topic=body.topic,
+            subject=body.subject,
+        )
+        context_prompt = _format_context_for_prompt(context_data, context_type="project")
+        logger.info("Education context fetched", extra={"counts": context_data.get("counts", {})})
+
         common_vars = {
             "grade": str(body.grade),
             "subject": body.subject,
@@ -48,6 +59,7 @@ class ScienceProjectService:
             "difficulty": body.difficulty,
             "budget": body.budget,
             "age_range": age_range,
+            "educational_context": context_prompt,
         }
 
         # Step 1: Generate project idea

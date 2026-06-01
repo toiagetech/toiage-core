@@ -4,6 +4,8 @@ Topic: {topic}
 Difficulty Level: {difficulty}
 Budget Constraint: {budget}
 
+{educational_context}
+
 The project should be:
 - Hands-on and buildable with commonly available materials in India
 - Aligned with CBSE Class {grade} {subject} curriculum

@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     DEEPSEEK_BASE_URL: str = "https://api.deepseek.com/v1"
     DEEPSEEK_DEFAULT_MODEL: str = "deepseek-chat"
 
+    # Education Engine
+    EDUCATION_ENGINE_URL: str = "http://localhost:8001"
+    EDUCATION_ENGINE_ENABLED: bool = True
+
     # Security
     CORS_ALLOWED_ORIGINS: list[str] = ["*"]
     MAX_REQUEST_BODY_SIZE_BYTES: int = 1_048_576  # 1 MB for JSON bodies (< uploads handled separately)
