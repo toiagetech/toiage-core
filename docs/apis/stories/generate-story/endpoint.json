@@ -1,0 +1,5 @@
+{
+  "method": "POST",
+  "path": "/stories/generate",
+  "description": "Generate a personalized story for a child"
+}

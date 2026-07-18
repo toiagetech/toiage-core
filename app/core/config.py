@@ -13,6 +13,10 @@ class Settings(BaseSettings):
 
     APP_NAME: str = "ToiageCore"
     APP_ENV: str = "development"
+    # Path prefix the API app is mounted under when served by uvicorn.
+    # Set to "" or "/" to serve at the root (e.g. http://localhost:8000/).
+    # Default serves at http://localhost:8000/toiage-core/
+    API_PREFIX: str = "/toiage-core"
     DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/toiage"
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"

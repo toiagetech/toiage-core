@@ -6,6 +6,211 @@
     "version": "2.0.0"
   },
   "paths": {
+    "/children": {
+      "post": {
+        "tags": [
+          "children"
+        ],
+        "summary": "Create a new child profile",
+        "description": "Create a new child profile for the authenticated parent. The profile is stored in the database and used by the story/activity generation pipeline to personalize content.",
+        "operationId": "create_child_endpoint_children_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChildCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error (missing required fields)"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "children"
+        ],
+        "summary": "Get all children for the current parent",
+        "description": "Retrieve all child profiles belonging to a parent, ordered by creation date (newest first). Provide the parent's user ID via the `parentId` query parameter.",
+        "operationId": "list_children_endpoint_children_get",
+        "parameters": [
+          {
+            "name": "parentId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The parent's user ID",
+              "title": "Parentid"
+            },
+            "description": "The parent's user ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChildRead"
+                  },
+                  "title": "Response List Children Endpoint Children Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Missing parentId query parameter"
+          }
+        }
+      }
+    },
+    "/children/{child_id}": {
+      "get": {
+        "tags": [
+          "children"
+        ],
+        "summary": "Get a specific child's details",
+        "description": "Retrieve a single child profile by its unique identifier.",
+        "operationId": "get_child_endpoint_children__child_id__get",
+        "parameters": [
+          {
+            "name": "child_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Child Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildRead"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Child not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "children"
+        ],
+        "summary": "Update a child by ID",
+        "description": "Update an existing child profile. Only the fields provided in the request body are updated (partial update).",
+        "operationId": "update_child_endpoint_children__child_id__put",
+        "parameters": [
+          {
+            "name": "child_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Child Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChildUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildRead"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Child not found"
+          },
+          "422": {
+            "description": "Validation error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "children"
+        ],
+        "summary": "Delete a child by ID",
+        "description": "Delete a child profile by its unique identifier.",
+        "operationId": "delete_child_endpoint_children__child_id__delete",
+        "parameters": [
+          {
+            "name": "child_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Child Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Child not found"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ai/test": {
       "post": {
         "tags": [
@@ -92,6 +297,47 @@
         }
       }
     },
+    "/stories/generate": {
+      "post": {
+        "tags": [
+          "stories"
+        ],
+        "summary": "Generate a personalized AI story",
+        "description": "Generate a personalized, age-appropriate story based on parent-selected parameters (goal, mood, length, theme, today's context) and optionally a child profile for personalization. The story is generated via the LLM and persisted to the database in a single call. Provider defaults to 'mock' (no API key required); set provider='openrouter' to use the real model.",
+        "operationId": "generate_story_endpoint_stories_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryGenerateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryGenerateResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Prompt template not found"
+          },
+          "422": {
+            "description": "Validation error (missing required fields)"
+          },
+          "400": {
+            "description": "Invalid request (e.g., unknown LLM provider)"
+          }
+        }
+      }
+    },
     "/stories": {
       "get": {
         "tags": [
@@ -121,8 +367,8 @@
         "tags": [
           "stories"
         ],
-        "summary": "Create a story",
-        "description": "Save a new story to the database. The story content should be generated beforehand via the AI endpoint.",
+        "summary": "Create a story (legacy)",
+        "description": "Save a new story to the database. The story content should be generated beforehand, or use POST /stories/generate to do both in one call.",
         "operationId": "create_story_stories_post",
         "requestBody": {
           "content": {
@@ -888,9 +1134,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -929,9 +1173,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -982,9 +1224,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -1023,9 +1263,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -1076,9 +1314,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -1117,9 +1353,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -1170,9 +1404,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -1211,9 +1443,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -1264,9 +1494,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -1305,9 +1533,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           },
@@ -1333,9 +1559,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           }
@@ -1351,9 +1575,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-
-                }
+                "schema": {}
               }
             }
           }
@@ -1376,7 +1598,9 @@
             ],
             "title": "Story Id",
             "description": "ID of an existing story to base activity on",
-            "examples": [1]
+            "examples": [
+              1
+            ]
           },
           "story_text": {
             "anyOf": [
@@ -1436,7 +1660,9 @@
             "type": "integer",
             "title": "Id",
             "description": "Unique activity identifier",
-            "examples": [1]
+            "examples": [
+              1
+            ]
           },
           "title": {
             "type": "string",
@@ -1498,7 +1724,9 @@
             ],
             "title": "Story Id",
             "description": "Source story ID if generated from an existing story",
-            "examples": [1]
+            "examples": [
+              1
+            ]
           },
           "created_at": {
             "type": "string",
@@ -1539,7 +1767,9 @@
             "type": "integer",
             "title": "Id",
             "description": "Unique activity identifier",
-            "examples": [1]
+            "examples": [
+              1
+            ]
           },
           "story_id": {
             "anyOf": [
@@ -1552,7 +1782,9 @@
             ],
             "title": "Story Id",
             "description": "Source story ID",
-            "examples": [1]
+            "examples": [
+              1
+            ]
           },
           "title": {
             "type": "string",
@@ -1742,7 +1974,9 @@
             "type": "integer",
             "title": "Step Number",
             "description": "Step number",
-            "examples": [1]
+            "examples": [
+              1
+            ]
           },
           "title": {
             "type": "string",
@@ -1758,7 +1992,9 @@
             "type": "integer",
             "title": "Estimated Time Minutes",
             "description": "Estimated time for this step",
-            "examples": [15]
+            "examples": [
+              15
+            ]
           },
           "materials_needed": {
             "items": {
@@ -1790,6 +2026,646 @@
         ],
         "title": "BuildStep",
         "description": "A single build step for a project."
+      },
+      "ChildCreate": {
+        "properties": {
+          "parentId": {
+            "type": "string",
+            "title": "Parentid",
+            "description": "Owning parent's user ID",
+            "examples": [
+              "parent-001"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Child's first name",
+            "examples": [
+              "Aria"
+            ]
+          },
+          "nickName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nickname",
+            "description": "Child's nickname",
+            "examples": [
+              "Aru"
+            ]
+          },
+          "dateOfBirth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dateofbirth",
+            "description": "Date of birth (ISO date)",
+            "examples": [
+              "2021-05-18"
+            ]
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender",
+            "description": "Gender",
+            "examples": [
+              "FEMALE",
+              "male",
+              "other"
+            ]
+          },
+          "preferredLanguage": {
+            "type": "string",
+            "title": "Preferredlanguage",
+            "description": "Preferred language code",
+            "default": "en",
+            "examples": [
+              "en"
+            ]
+          },
+          "schoolName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schoolname",
+            "description": "School name",
+            "examples": [
+              "Little Stars Preschool"
+            ]
+          },
+          "currentClass": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currentclass",
+            "description": "Current class/grade",
+            "examples": [
+              "UKG"
+            ]
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Board",
+            "description": "Education board",
+            "examples": [
+              "CBSE"
+            ]
+          },
+          "interests": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interests",
+            "description": "Child's interests",
+            "examples": [
+              [
+                "Animals",
+                "Space",
+                "Building"
+              ]
+            ]
+          },
+          "favouriteSubjects": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Favouritesubjects",
+            "description": "Favourite subjects",
+            "examples": [
+              [
+                "Science",
+                "Art"
+              ]
+            ]
+          },
+          "learningStyle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learningstyle",
+            "description": "Learning style",
+            "examples": [
+              "VISUAL",
+              "kinesthetic"
+            ]
+          },
+          "existingToys": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Existingtoys",
+            "description": "Existing toys at home"
+          },
+          "householdMaterials": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Householdmaterials",
+            "description": "Available household materials"
+          },
+          "specialNotes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Specialnotes",
+            "description": "Special notes about the child"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parentId",
+          "name"
+        ],
+        "title": "ChildCreate",
+        "description": "Request to create a new child profile."
+      },
+      "ChildRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique child identifier",
+            "examples": [
+              1
+            ]
+          },
+          "parentId": {
+            "type": "string",
+            "title": "Parentid",
+            "description": "Owning parent's user ID",
+            "examples": [
+              "parent-001"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "description": "Child's first name"
+          },
+          "nickName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nickname",
+            "description": "Child's nickname"
+          },
+          "dateOfBirth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dateofbirth",
+            "description": "Date of birth"
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender",
+            "description": "Gender"
+          },
+          "schoolName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schoolname",
+            "description": "School name"
+          },
+          "currentClass": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currentclass",
+            "description": "Current class/grade"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Board",
+            "description": "Education board"
+          },
+          "preferredLanguage": {
+            "type": "string",
+            "title": "Preferredlanguage",
+            "description": "Preferred language code",
+            "default": "en"
+          },
+          "learningStyle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learningstyle",
+            "description": "Learning style"
+          },
+          "interests": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interests",
+            "description": "Child's interests"
+          },
+          "favouriteSubjects": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Favouritesubjects",
+            "description": "Favourite subjects"
+          },
+          "existingToys": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Existingtoys",
+            "description": "Existing toys at home"
+          },
+          "householdMaterials": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Householdmaterials",
+            "description": "Available household materials"
+          },
+          "specialNotes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Specialnotes",
+            "description": "Special notes"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Createdat",
+            "description": "When the profile was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updatedat",
+            "description": "When the profile was last updated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "parentId",
+          "name",
+          "createdAt",
+          "updatedAt"
+        ],
+        "title": "ChildRead",
+        "description": "A saved child profile."
+      },
+      "ChildUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Child's first name",
+            "examples": [
+              "Aarav"
+            ]
+          },
+          "nickName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nickname",
+            "description": "Child's nickname",
+            "examples": [
+              "Aaru"
+            ]
+          },
+          "dateOfBirth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dateofbirth",
+            "description": "Date of birth (ISO date)",
+            "examples": [
+              "2020-03-15"
+            ]
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender",
+            "description": "Gender",
+            "examples": [
+              "male"
+            ]
+          },
+          "schoolName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schoolname",
+            "description": "School name"
+          },
+          "currentClass": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currentclass",
+            "description": "Current class/grade"
+          },
+          "board": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Board",
+            "description": "Education board"
+          },
+          "preferredLanguage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preferredlanguage",
+            "description": "Preferred language code"
+          },
+          "learningStyle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learningstyle",
+            "description": "Learning style"
+          },
+          "interests": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interests",
+            "description": "Child's interests"
+          },
+          "favouriteSubjects": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Favouritesubjects",
+            "description": "Favourite subjects"
+          },
+          "existingToys": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Existingtoys",
+            "description": "Existing toys at home"
+          },
+          "householdMaterials": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Householdmaterials",
+            "description": "Available household materials"
+          },
+          "specialNotes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Specialnotes",
+            "description": "Special notes about the child"
+          }
+        },
+        "type": "object",
+        "title": "ChildUpdate",
+        "description": "Request to update an existing child profile (all fields optional)."
       },
       "CreatePrototypeRequest": {
         "properties": {
@@ -1873,7 +2749,9 @@
             "type": "integer",
             "title": "Grade",
             "description": "CBSE class grade",
-            "examples": [6]
+            "examples": [
+              6
+            ]
           },
           "subject": {
             "type": "string",
@@ -2015,7 +2893,9 @@
             ],
             "title": "Id",
             "description": "Generation history ID",
-            "examples": [42]
+            "examples": [
+              42
+            ]
           },
           "pattern_id": {
             "anyOf": [
@@ -2028,7 +2908,9 @@
             ],
             "title": "Pattern Id",
             "description": "Saved pattern ID",
-            "examples": [5]
+            "examples": [
+              5
+            ]
           },
           "pattern_name": {
             "anyOf": [
@@ -2090,21 +2972,27 @@
           },
           "temperature": {
             "type": "number",
-            "maximum": 2,
-            "minimum": 0,
+            "maximum": 2.0,
+            "minimum": 0.0,
             "title": "Temperature",
             "description": "Sampling temperature (0.0-2.0)",
             "default": 0.7,
-            "examples": [0.7, 1]
+            "examples": [
+              0.7,
+              1.0
+            ]
           },
           "max_tokens": {
             "type": "integer",
-            "maximum": 8192,
-            "minimum": 1,
+            "maximum": 8192.0,
+            "minimum": 1.0,
             "title": "Max Tokens",
             "description": "Maximum tokens in the response",
             "default": 1024,
-            "examples": [100, 1024]
+            "examples": [
+              100,
+              1024
+            ]
           }
         },
         "type": "object",
@@ -2206,16 +3094,16 @@
           },
           "temperature": {
             "type": "number",
-            "maximum": 2,
-            "minimum": 0,
+            "maximum": 2.0,
+            "minimum": 0.0,
             "title": "Temperature",
             "description": "Sampling temperature (0.0-2.0)",
             "default": 0.7
           },
           "max_tokens": {
             "type": "integer",
-            "maximum": 8192,
-            "minimum": 1,
+            "maximum": 8192.0,
+            "minimum": 1.0,
             "title": "Max Tokens",
             "description": "Maximum tokens in the response",
             "default": 1024
@@ -2291,7 +3179,9 @@
             "type": "number",
             "title": "Estimated Cost Rs",
             "description": "Estimated cost in rupees",
-            "examples": [50]
+            "examples": [
+              50
+            ]
           },
           "source": {
             "type": "string",
@@ -2477,13 +3367,20 @@
             "type": "integer",
             "title": "Count",
             "description": "Number of questions of this type",
-            "examples": [5]
+            "examples": [
+              5
+            ]
           },
           "marks_per_question": {
             "type": "integer",
             "title": "Marks Per Question",
             "description": "Marks per question",
-            "examples": [1, 2, 3, 5]
+            "examples": [
+              1,
+              2,
+              3,
+              5
+            ]
           },
           "difficulty": {
             "type": "string",
@@ -2539,7 +3436,9 @@
             "type": "integer",
             "title": "Upload Id",
             "description": "ID of the upload being reflected on",
-            "examples": [1]
+            "examples": [
+              1
+            ]
           },
           "message": {
             "type": "string",
@@ -2580,7 +3479,9 @@
             "type": "integer",
             "title": "Grade",
             "description": "CBSE class grade (6, 7, or 8)",
-            "examples": [6]
+            "examples": [
+              6
+            ]
           },
           "subject": {
             "type": "string",
@@ -2656,7 +3557,9 @@
             ],
             "title": "Project Id",
             "description": "Database record ID",
-            "examples": [1]
+            "examples": [
+              1
+            ]
           },
           "created_at": {
             "anyOf": [
@@ -2707,7 +3610,9 @@
             "type": "integer",
             "title": "Grade",
             "description": "CBSE class grade",
-            "examples": [6]
+            "examples": [
+              6
+            ]
           },
           "topic": {
             "type": "string",
@@ -2958,7 +3863,244 @@
           "theme"
         ],
         "title": "StoryCreate",
-        "description": "Request to create a new story."
+        "description": "Request to create a new story (legacy)."
+      },
+      "StoryGenerateRequest": {
+        "properties": {
+          "goal": {
+            "type": "string",
+            "title": "Goal",
+            "description": "The learning goal/value the story should teach",
+            "examples": [
+              "friendship"
+            ]
+          },
+          "storyMood": {
+            "type": "string",
+            "title": "Storymood",
+            "description": "The mood of the story",
+            "examples": [
+              "bedtime"
+            ]
+          },
+          "storyLength": {
+            "type": "string",
+            "title": "Storylength",
+            "description": "The length of the story",
+            "examples": [
+              "short"
+            ]
+          },
+          "theme": {
+            "type": "string",
+            "title": "Theme",
+            "description": "The theme/setting of the story",
+            "examples": [
+              "forest"
+            ]
+          },
+          "todayContext": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Todaycontext",
+            "description": "Optional context about the child's day",
+            "examples": [
+              "Aria was feeling lonely because her best friend did not play with her today."
+            ]
+          },
+          "childId": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Childid",
+            "description": "Optional child ID for personalization"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "description": "LLM provider: mock, openrouter, or deepseek",
+            "default": "mock",
+            "examples": [
+              "mock",
+              "openrouter"
+            ]
+          },
+          "temperature": {
+            "type": "number",
+            "maximum": 2.0,
+            "minimum": 0.0,
+            "title": "Temperature",
+            "description": "Sampling temperature (0.0-2.0)",
+            "default": 0.7,
+            "examples": [
+              0.7,
+              1.0
+            ]
+          },
+          "max_tokens": {
+            "type": "integer",
+            "maximum": 8192.0,
+            "minimum": 1.0,
+            "title": "Max Tokens",
+            "description": "Maximum tokens in the response",
+            "default": 1024,
+            "examples": [
+              100,
+              1024
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "goal",
+          "storyMood",
+          "storyLength",
+          "theme"
+        ],
+        "title": "StoryGenerateRequest",
+        "description": "Request to generate a personalized AI story.\n\nThe parent selects these values in the UI before generating a story.\nThe backend uses them (along with the saved child profile) to generate\na personalized story."
+      },
+      "StoryGenerateResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Unique story identifier",
+            "examples": [
+              1
+            ]
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Generated story title"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content",
+            "description": "The story text content"
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal",
+            "description": "Learning goal"
+          },
+          "storyMood": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storymood",
+            "description": "Story mood"
+          },
+          "storyLength": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storylength",
+            "description": "Story length"
+          },
+          "theme": {
+            "type": "string",
+            "title": "Theme",
+            "description": "Story theme/setting"
+          },
+          "todayContext": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Todaycontext",
+            "description": "Today's context"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At",
+            "description": "When the story was created"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider",
+            "description": "The LLM provider that generated the story",
+            "examples": [
+              "mock",
+              "openrouter"
+            ]
+          },
+          "model": {
+            "type": "string",
+            "title": "Model",
+            "description": "The model that generated the story",
+            "examples": [
+              "mock-model-v1"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "content",
+          "theme",
+          "created_at",
+          "provider",
+          "model"
+        ],
+        "title": "StoryGenerateResponse",
+        "description": "Response for the generated-and-saved story.",
+        "examples": [
+          {
+            "content": "Once upon a time, in a bright green forest...",
+            "created_at": "2026-07-18T11:00:00Z",
+            "goal": "friendship",
+            "id": 1,
+            "model": "mock-model-v1",
+            "provider": "mock",
+            "storyLength": "short",
+            "storyMood": "bedtime",
+            "theme": "forest",
+            "title": "Aria and the Forest Friends",
+            "todayContext": "Aria was feeling lonely because her best friend did not play with her today."
+          }
+        ]
       },
       "StoryRead": {
         "properties": {
@@ -2966,39 +4108,96 @@
             "type": "integer",
             "title": "Id",
             "description": "Unique story identifier",
-            "examples": [1]
+            "examples": [
+              1
+            ]
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title",
+            "description": "Generated story title"
           },
           "content": {
             "type": "string",
             "title": "Content",
             "description": "The story text content"
           },
-          "age_group": {
-            "type": "string",
-            "title": "Age Group",
-            "description": "Target age group",
-            "examples": [
-              "3-5"
-            ]
+          "goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal",
+            "description": "Learning goal"
+          },
+          "storyMood": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storymood",
+            "description": "Story mood"
+          },
+          "storyLength": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Storylength",
+            "description": "Story length"
           },
           "theme": {
             "type": "string",
             "title": "Theme",
-            "description": "Story theme",
-            "examples": [
-              "friendship"
-            ]
+            "description": "Story theme"
+          },
+          "todayContext": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Todaycontext",
+            "description": "Today's context"
+          },
+          "age_group": {
+            "type": "string",
+            "title": "Age Group",
+            "description": "Target age group (legacy)",
+            "default": ""
           },
           "skills": {
             "type": "string",
             "title": "Skills",
-            "description": "Skills developed",
+            "description": "Skills developed (legacy)",
             "default": ""
           },
           "difficulty": {
             "type": "string",
             "title": "Difficulty",
-            "description": "Reading difficulty",
+            "description": "Reading difficulty (legacy)",
             "default": "beginner"
           },
           "created_at": {
@@ -3012,23 +4211,11 @@
         "required": [
           "id",
           "content",
-          "age_group",
           "theme",
           "created_at"
         ],
         "title": "StoryRead",
-        "description": "A saved story with metadata.",
-        "examples": [
-          {
-            "age_group": "3-5",
-            "content": "Once upon a time...",
-            "created_at": "2026-05-22T10:00:00Z",
-            "difficulty": "beginner",
-            "id": 1,
-            "skills": "reading, empathy",
-            "theme": "friendship"
-          }
-        ]
+        "description": "A saved story with metadata (legacy)."
       },
       "UpdateStatusRequest": {
         "properties": {
@@ -3053,7 +4240,9 @@
             "type": "integer",
             "title": "Id",
             "description": "Unique upload identifier",
-            "examples": [1]
+            "examples": [
+              1
+            ]
           },
           "filename": {
             "type": "string",
@@ -3075,7 +4264,9 @@
             "type": "integer",
             "title": "File Size",
             "description": "File size in bytes",
-            "examples": [8632]
+            "examples": [
+              8632
+            ]
           },
           "mime_type": {
             "type": "string",

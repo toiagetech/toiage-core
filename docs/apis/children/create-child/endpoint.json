@@ -1,0 +1,11 @@
+{
+  "method": "POST",
+  "path": "/children",
+  "summary": "Create a new child profile",
+  "description": "Create a new child profile for the authenticated parent. The profile is stored in the database and used by the story/activity generation pipeline to personalize content.",
+  "tags": ["children"],
+  "statusCodes": {
+    "201": "Child profile created successfully",
+    "422": "Validation error (missing required fields)"
+  }
+}

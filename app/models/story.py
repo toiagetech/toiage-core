@@ -4,14 +4,24 @@ from sqlmodel import Field, SQLModel
 
 
 class Story(SQLModel, table=True):
-    """Generated story with metadata for future recommendation systems."""
+    """Generated story with metadata for future recommendation systems.
+
+    Supports the parent-selected generation flow where the parent chooses
+    a goal, mood, length, theme, and optional today's context.
+    """
 
     __tablename__ = "stories"
 
     id: int | None = Field(default=None, primary_key=True)
+    title: str | None = Field(default=None, description="Generated story title")
     content: str = Field(nullable=False)
-    age_group: str = Field(nullable=False, index=True)
-    theme: str = Field(nullable=False, index=True)
+    goal: str | None = Field(default=None, index=True, description="Learning goal (e.g. friendship, kindness)")
+    story_mood: str | None = Field(default=None, description="Story mood (e.g. bedtime, adventure)")
+    story_length: str | None = Field(default=None, description="Story length (e.g. short, medium, long)")
+    theme: str = Field(nullable=False, index=True, description="Story theme/setting (e.g. forest, space)")
+    today_context: str | None = Field(default=None, description="Optional context about the child's day")
+    # Legacy fields (kept for backward compatibility with existing data/migrations)
+    age_group: str = Field(default="", nullable=False, index=True)
     skills: str = Field(default="", nullable=False)
     difficulty: str = Field(default="beginner", nullable=False)
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)

@@ -1,0 +1,21 @@
+{
+  "id": "mock_child_aarav_001",
+  "parentId": "mock_user_manas_001",
+  "name": "Aarav",
+  "nickName": "Aaru",
+  "age": 6,
+  "dateOfBirth": "2020-03-15",
+  "gender": "male",
+  "schoolName": "Sunrise International School",
+  "class": "1",
+  "board": "CBSE",
+  "interests": ["Space", "Building", "Animals"],
+  "favouriteSubjects": ["Science", "Art"],
+  "learningStyle": "kinesthetic",
+  "preferredLanguage": "en",
+  "existingToys": ["Building Blocks", "Puzzle Sets", "Toy Cars", "Animal Figurines"],
+  "householdMaterials": ["Paper", "Crayons", "Scissors", "Cardboard Boxes", "Glue"],
+  "specialNotes": "Loves building things with blocks. Very curious about space and rockets.",
+  "createdAt": "2026-02-10T10:00:00.000Z",
+  "updatedAt": "2026-06-15T16:30:00.000Z"
+}

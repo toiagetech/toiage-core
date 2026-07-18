@@ -1,0 +1,18 @@
+{
+  "id": "child-001",
+  "parentId": "parent-001",
+  "firstName": "Aria",
+  "nickname": "Aru",
+  "dateOfBirth": "2021-05-18",
+  "age": 5,
+  "gender": "FEMALE",
+  "preferredLanguage": "en",
+  "schoolName": "Little Stars Preschool",
+  "currentClass": "UKG",
+  "interests": [
+    "Animals",
+    "Space",
+    "Building"
+  ],
+  "learningStyle": "VISUAL"
+}

@@ -1,0 +1,27 @@
+{
+  "name": "Aarav",
+  "nickName": "Aaru",
+  "schoolName": "Sunrise International School",
+  "currentClass": "1",
+  "board": "CBSE",
+  "interests": [
+    "Space",
+    "Building",
+    "Animals"
+  ],
+  "favouriteSubjects": [
+    "Science",
+    "Art"
+  ],
+  "learningStyle": "kinesthetic",
+  "existingToys": [
+    "Building Blocks",
+    "Puzzle Sets"
+  ],
+  "householdMaterials": [
+    "Paper",
+    "Crayons",
+    "Scissors"
+  ],
+  "specialNotes": "Loves building things with blocks. Very curious about space and rockets."
+}

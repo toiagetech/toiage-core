@@ -1,0 +1,6 @@
+{
+  "method": "PUT",
+  "path": "/children/{id}",
+  "description": "Update a child by ID (legacy mock UI)",
+  "example": "PUT /children/mock_child_aarav_001"
+}

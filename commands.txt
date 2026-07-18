@@ -1,69 +1,85 @@
 uv sync
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# === RUN ===
+# Serve the API under the configured prefix (default /toiage-core):
+#   http://localhost:8000/toiage-core/docs
+# To serve at the root instead, set API_PREFIX= in .env and use app.main:app
+uv run uvicorn app.main:root_app --reload --host 0.0.0.0 --port 8000
 
 # === STORIES ===
-# Create a story (save to DB)
-curl -X POST http://localhost:8000/stories \
+# Generate a story via LLM and save it in one call (mock provider — no API key needed)
+curl -X POST http://localhost:8000/toiage-core/stories/generate \
+  -H "Content-Type: application/json" \
+  -d '{"age":"5","theme":"friendship","child_name":"Aria","setting":"forest","word_count":"100","age_group":"3-5","skills":"reading, empathy","difficulty":"beginner","provider":"mock"}'
+
+# Generate a story via LLM and save it in one call (openrouter — real model, needs OPENROUTER_API_KEY)
+curl -X POST http://localhost:8000/toiage-core/stories/generate \
+  -H "Content-Type: application/json" \
+  -d '{"age":"5","theme":"friendship","child_name":"Aria","setting":"forest","word_count":"100","provider":"openrouter"}'
+
+# Create a story (save to DB only — content generated beforehand)
+curl -X POST http://localhost:8000/toiage-core/stories \
   -H "Content-Type: application/json" \
   -d '{"content":"Once upon a time, a brave rabbit explored a magical forest.","age_group":"3-5","theme":"adventure","skills":"reading, courage","difficulty":"beginner"}'
 
 # Get a story by ID
-curl http://localhost:8000/stories/1
+curl http://localhost:8000/toiage-core/stories/1
 
 # List all stories
-curl http://localhost:8000/stories
+curl http://localhost:8000/toiage-core/stories
 
 # === ACTIVITIES ===
 # Generate activity from story text (mock provider)
-curl -X POST http://localhost:8000/activities/generate \
+curl -X POST http://localhost:8000/toiage-core/activities/generate \
   -H "Content-Type: application/json" \
   -d '{"story_text":"A brave rabbit explored a cave full of crystals.","age_group":"3-5","provider":"mock"}'
 
 # Generate activity from existing story (openrouter)
-curl -X POST http://localhost:8000/activities/generate \
+curl -X POST http://localhost:8000/toiage-core/activities/generate \
   -H "Content-Type: application/json" \
   -d '{"story_id":1,"age_group":"3-5","provider":"openrouter"}'
 
 # Get an activity by ID
-curl http://localhost:8000/activities/1
+curl http://localhost:8000/toiage-core/activities/1
 
 # List all activities
-curl http://localhost:8000/activities
+curl http://localhost:8000/toiage-core/activities
 
 # === UPLOADS ===
 # Upload an image
-curl -X POST http://localhost:8000/uploads/image \
+curl -X POST http://localhost:8000/toiage-core/uploads/image \
   -F "file=@path/to/your/image.png"
 
 # Generate AI reflection on uploaded image (mock)
-curl -X POST http://localhost:8000/uploads/1/reflect \
+curl -X POST http://localhost:8000/toiage-core/uploads/1/reflect \
   -H "Content-Type: application/json" \
   -d '{"provider":"mock"}'
 
 # Generate AI reflection (openrouter - real AI vision)
-curl -X POST http://localhost:8000/uploads/1/reflect \
+curl -X POST http://localhost:8000/toiage-core/uploads/1/reflect \
   -H "Content-Type: application/json" \
   -d '{"provider":"openrouter"}'
 
 # === AI ===
 # Raw prompt test (mock)
-curl -X POST http://localhost:8000/ai/test \
+curl -X POST http://localhost:8000/toiage-core/ai/test \
   -H "Content-Type: application/json" \
   -d '{"prompt":"Write a short story about a dragon","provider":"mock"}'
 
 # Raw prompt test (openrouter)
-curl -X POST http://localhost:8000/ai/test \
+curl -X POST http://localhost:8000/toiage-core/ai/test \
   -H "Content-Type: application/json" \
   -d '{"prompt":"Write a short story about a dragon","provider":"openrouter","max_tokens":200}'
 
 # Prompt template test (mock)
-curl -X POST http://localhost:8000/ai/test-template \
+curl -X POST http://localhost:8000/toiage-core/ai/test-template \
   -H "Content-Type: application/json" \
   -d '{"template_category":"stories","template_name":"create","variables":{"age":"5","theme":"friendship","child_name":"Aria","setting":"forest","word_count":"100"},"provider":"mock"}'
 
 # === HEALTH ===
 curl http://localhost:8000/health
-curl http://localhost:8000/db-health
+curl http://localhost:8000/toiage-core/health
+curl http://localhost:8000/toiage-core/db-health
 
 # === SWAGGER ===
-# Open http://localhost:8000/docs in browser
+# Open http://localhost:8000/toiage-core/docs in browser

@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "parentId": "parent-001",
+    "name": "Aria",
+    "nickName": "Aru",
+    "dateOfBirth": "2021-05-18",
+    "gender": "FEMALE",
+    "schoolName": "Little Stars Preschool",
+    "currentClass": "UKG",
+    "board": null,
+    "preferredLanguage": "en",
+    "learningStyle": "VISUAL",
+    "interests": [
+      "Animals",
+      "Space",
+      "Building"
+    ],
+    "favouriteSubjects": [
+      "Science",
+      "Art"
+    ],
+    "existingToys": [
+      "Building Blocks",
+      "Puzzle Sets"
+    ],
+    "householdMaterials": [
+      "Paper",
+      "Crayons",
+      "Scissors"
+    ],
+    "specialNotes": "Loves building things with blocks. Very curious about space and rockets.",
+    "createdAt": "2026-07-18T10:30:00",
+    "updatedAt": "2026-07-18T10:30:00"
+  }
+]

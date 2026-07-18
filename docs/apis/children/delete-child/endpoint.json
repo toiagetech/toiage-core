@@ -1,0 +1,6 @@
+{
+  "method": "DELETE",
+  "path": "/children/{id}",
+  "description": "Delete a child by ID (legacy mock UI)",
+  "example": "DELETE /children/mock_child_aarav_001"
+}

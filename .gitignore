@@ -23,4 +23,6 @@ venv/
 ENV/
 env/
 .env
+.secrets
 .uv/
+.llm_cache/

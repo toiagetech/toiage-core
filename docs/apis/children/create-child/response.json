@@ -1,0 +1,9 @@
+{
+  "id": "child-001",
+  "parentId": "parent-001",
+  "firstName": "Aria",
+  "nickname": "Aru",
+  "age": 5,
+  "currentClass": "UKG",
+  "createdAt": "2026-07-18T10:30:00Z"
+}

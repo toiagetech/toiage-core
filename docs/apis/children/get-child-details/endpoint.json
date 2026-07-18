@@ -1,0 +1,6 @@
+{
+  "method": "GET",
+  "path": "/children/{childId}",
+  "description": "Get child details by ID",
+  "example": "GET /children/child-001"
+}

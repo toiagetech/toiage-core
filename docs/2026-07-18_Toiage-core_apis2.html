@@ -1,0 +1,151 @@
+<html><head><style>body {
+   color: black;
+}
+</style></head><body><p>Here&#39;s the complete API summary — all 17 endpoints with URLs and one-liner descriptions:</p>
+<h2 id="auth-6-">Auth (6)</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/auth/login</code></td>
+<td>Login with email and password</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/register</code></td>
+<td>Register a new parent account</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/forgot-password</code></td>
+<td>Request a password reset link</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/logout</code></td>
+<td>Logout the current user</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/auth/refresh-token</code></td>
+<td>Refresh the access token using a refresh token</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/auth/profile</code></td>
+<td>Get the current user&#39;s profile</td>
+</tr>
+</tbody>
+</table>
+<h2 id="parents-3-">Parents (3)</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/parents</code></td>
+<td>Create a parent profile after registration</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/parents/profile</code></td>
+<td>Get the current parent&#39;s profile</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/parents/profile</code></td>
+<td>Update the current parent&#39;s profile</td>
+</tr>
+</tbody>
+</table>
+<h2 id="children-6-">Children (6)</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/children</code></td>
+<td>Create a new child profile</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/children</code></td>
+<td>Get all children for the current parent</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/children/{childId}</code></td>
+<td>Get a specific child&#39;s details</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/children/{id}</code></td>
+<td>Get a child by ID (legacy mock UI)</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td><code>/children/{id}</code></td>
+<td>Update a child by ID</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td><code>/children/{id}</code></td>
+<td>Delete a child by ID</td>
+</tr>
+</tbody>
+</table>
+<h2 id="stories-1-">Stories (1)</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POST</td>
+<td><code>/stories/generate</code></td>
+<td>Generate a personalized AI story based on parent-selected goal, mood, length, theme, and today&#39;s context</td>
+</tr>
+</tbody>
+</table>
+<h2 id="dashboard-1-">Dashboard (1)</h2>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>URL</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/dashboard</code></td>
+<td>Get the parent dashboard aggregate data (welcome, active child, recommendations, activities, learning journey, quick actions)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Total: 17 endpoints</strong> — all have static <code>endpoint.json</code>, <code>request.json</code> (where applicable), and <code>response.json</code> files in <code>src/shared/mock/api/</code>.</p>
+</body></html>

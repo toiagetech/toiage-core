@@ -1,0 +1,6 @@
+{
+  "method": "GET",
+  "path": "/children/{id}",
+  "description": "Get a child by ID (legacy mock UI)",
+  "example": "GET /children/mock_child_aarav_001"
+}

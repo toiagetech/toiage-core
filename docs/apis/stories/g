@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "title": "Aria and the Forest Friends",
+  "content": "Once upon a time, in a bright green forest, a little girl named Aria went for a walk. She heard a tiny sound near a bush and found a small rabbit with soft brown fur. \"Hello!\" said Aria gently. The rabbit looked up with big round eyes. \"Are you lost?\" Aria asked. The rabbit nodded. Aria sat down beside the rabbit and shared her apple. Soon a squirrel came by, and then a little deer. They all sat together, eating and smiling. Aria helped the rabbit find its way home, and all the new friends waved goodbye. Aria felt warm and happy in her heart, knowing she had made new friends today.",
+  "goal": "friendship",
+  "storyMood": "bedtime",
+  "storyLength": "short",
+  "theme": "forest",
+  "todayContext": "Aria was feeling lonely because her best friend did not play with her today.",
+  "createdAt": "2026-07-18T11:00:00Z",
+  "provider": "mock",
+  "model": "mock-model-v1"
+}

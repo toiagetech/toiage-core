@@ -1,0 +1,260 @@
+<html><head><style>body {
+   color: black;
+}
+</style></head><body><p>The story generation endpoint is fully implemented and tested. Here are the details you asked for:</p>
+<h2 id="endpoint">Endpoint</h2>
+<pre><code>POST /stories/<span class="hljs-keyword">generate</span>
+</code></pre><p><strong>Summary:</strong> Generate a personalized AI story based on parent-selected parameters (goal, mood, length, theme, today&#39;s context) and optionally a child profile for personalization. The story is generated via the LLM and persisted to the database in a single call.</p>
+<h2 id="request-body-storygeneraterequest-">Request Body (<code>StoryGenerateRequest</code>)</h2>
+<pre><code class="lang-json">{
+  <span class="hljs-attr">"goal"</span>: <span class="hljs-string">"friendship"</span>,
+  <span class="hljs-attr">"storyMood"</span>: <span class="hljs-string">"bedtime"</span>,
+  <span class="hljs-attr">"storyLength"</span>: <span class="hljs-string">"short"</span>,
+  <span class="hljs-attr">"theme"</span>: <span class="hljs-string">"forest"</span>,
+  <span class="hljs-attr">"todayContext"</span>: <span class="hljs-string">"Aria was feeling lonely because her best friend did not play with her today."</span>,
+  <span class="hljs-attr">"childId"</span>: <span class="hljs-number">1</span>,
+  <span class="hljs-attr">"provider"</span>: <span class="hljs-string">"mock"</span>,
+  <span class="hljs-attr">"temperature"</span>: <span class="hljs-number">0.7</span>,
+  <span class="hljs-attr">"maxTokens"</span>: <span class="hljs-number">1024</span>
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Required</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>goal</code></td>
+<td>string</td>
+<td>✅</td>
+<td>—</td>
+<td>Learning goal/value the story should teach (e.g. <code>friendship</code>, <code>kindness</code>)</td>
+</tr>
+<tr>
+<td><code>storyMood</code></td>
+<td>string</td>
+<td>✅</td>
+<td>—</td>
+<td>Mood of the story (e.g. <code>bedtime</code>, <code>adventure</code>)</td>
+</tr>
+<tr>
+<td><code>storyLength</code></td>
+<td>string</td>
+<td>✅</td>
+<td>—</td>
+<td>Length: <code>short</code> (~100 words), <code>medium</code> (~200), <code>long</code> (~400)</td>
+</tr>
+<tr>
+<td><code>theme</code></td>
+<td>string</td>
+<td>✅</td>
+<td>—</td>
+<td>Theme/setting (e.g. <code>forest</code>, <code>space</code>)</td>
+</tr>
+<tr>
+<td><code>todayContext</code></td>
+<td>string</td>
+<td>❌</td>
+<td><code>null</code></td>
+<td>Optional context about the child&#39;s day</td>
+</tr>
+<tr>
+<td><code>childId</code></td>
+<td>int</td>
+<td>❌</td>
+<td><code>null</code></td>
+<td>Optional child ID for personalization (pulls name, interests, notes)</td>
+</tr>
+<tr>
+<td><code>provider</code></td>
+<td>string</td>
+<td>❌</td>
+<td><code>&quot;mock&quot;</code></td>
+<td>LLM provider: <code>mock</code>, <code>openrouter</code>, or <code>deepseek</code></td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td>float</td>
+<td>❌</td>
+<td><code>0.7</code></td>
+<td>Sampling temperature (0.0–2.0)</td>
+</tr>
+<tr>
+<td><code>maxTokens</code></td>
+<td>int</td>
+<td>❌</td>
+<td><code>1024</code></td>
+<td>Max tokens in response (1–8192)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="response-storygenerateresponse-201-created-">Response (<code>StoryGenerateResponse</code>) — <code>201 Created</code></h2>
+<pre><code class="lang-json">{
+  <span class="hljs-attr">"id"</span>: <span class="hljs-number">13</span>,
+  <span class="hljs-attr">"title"</span>: <span class="hljs-string">"Aria and the Forest Friends"</span>,
+  <span class="hljs-attr">"content"</span>: <span class="hljs-string">"Once upon a time, in a bright green forest..."</span>,
+  <span class="hljs-attr">"goal"</span>: <span class="hljs-string">"friendship"</span>,
+  <span class="hljs-attr">"storyMood"</span>: <span class="hljs-string">"bedtime"</span>,
+  <span class="hljs-attr">"storyLength"</span>: <span class="hljs-string">"short"</span>,
+  <span class="hljs-attr">"theme"</span>: <span class="hljs-string">"forest"</span>,
+  <span class="hljs-attr">"todayContext"</span>: <span class="hljs-string">"Aria was feeling lonely because her best friend did not play with her today."</span>,
+  <span class="hljs-attr">"createdAt"</span>: <span class="hljs-string">"2026-07-18T14:56:47.130189"</span>,
+  <span class="hljs-attr">"provider"</span>: <span class="hljs-string">"mock"</span>,
+  <span class="hljs-attr">"model"</span>: <span class="hljs-string">"mock-model-v1"</span>
+}
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>int</td>
+<td>Unique story identifier</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>string\</td>
+<td>null</td>
+<td>Generated story title (parsed from LLM first line)</td>
+</tr>
+<tr>
+<td><code>content</code></td>
+<td>string</td>
+<td>The story text</td>
+</tr>
+<tr>
+<td><code>goal</code></td>
+<td>string\</td>
+<td>null</td>
+<td>Learning goal</td>
+</tr>
+<tr>
+<td><code>storyMood</code></td>
+<td>string\</td>
+<td>null</td>
+<td>Story mood</td>
+</tr>
+<tr>
+<td><code>storyLength</code></td>
+<td>string\</td>
+<td>null</td>
+<td>Story length</td>
+</tr>
+<tr>
+<td><code>theme</code></td>
+<td>string</td>
+<td>Story theme/setting</td>
+</tr>
+<tr>
+<td><code>todayContext</code></td>
+<td>string\</td>
+<td>null</td>
+<td>Today&#39;s context</td>
+</tr>
+<tr>
+<td><code>createdAt</code></td>
+<td>datetime</td>
+<td>When the story was created</td>
+</tr>
+<tr>
+<td><code>provider</code></td>
+<td>string</td>
+<td>LLM provider that generated the story</td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td>string</td>
+<td>Model that generated the story</td>
+</tr>
+</tbody>
+</table>
+<h2 id="how-it-works-pipeline-">How it works (pipeline)</h2>
+<ol>
+<li>Optionally loads the <code>Child</code> profile (by <code>childId</code>) for personalization — injects name, nickname, interests, and special notes into the prompt.</li>
+<li>Loads the <code>stories/generate.txt</code> prompt template and injects variables.</li>
+<li>Prepends the system prompt (tone/safety rules).</li>
+<li>Calls the configured LLM provider via <code>llm_manager</code> (defaults to <code>mock</code> — no API key needed).</li>
+<li>Parses the title (first line) and content from the LLM response.</li>
+<li>Saves the story to the <code>stories</code> table.</li>
+<li>Emits the <code>story_generated</code> analytics event.</li>
+</ol>
+<h2 id="files-created-modified">Files created/modified</h2>
+<p><strong>New files:</strong></p>
+<ul>
+<li><code>app/models/child.py</code> — <code>Child</code> model (children table)</li>
+<li><code>app/schemas/child.py</code> — <code>ChildCreate</code>, <code>ChildUpdate</code>, <code>ChildRead</code></li>
+<li><code>app/services/children.py</code> — CRUD service</li>
+<li><code>app/api/children.py</code> — <code>/children</code> CRUD endpoints</li>
+<li><code>app/prompts/stories/generate.txt</code> — new prompt template</li>
+<li><code>alembic/versions/93a8be9fd172_create_children_table_and_add_story_.py</code> — migration</li>
+</ul>
+<p><strong>Modified files:</strong></p>
+<ul>
+<li><code>app/models/story.py</code> — added <code>title</code>, <code>goal</code>, <code>story_mood</code>, <code>story_length</code>, <code>today_context</code> columns</li>
+<li><code>app/schemas/story.py</code> — added <code>StoryGenerateRequest</code> and <code>StoryGenerateResponse</code></li>
+<li><code>app/services/stories.py</code> — added <code>generate_story()</code> function</li>
+<li><code>app/api/stories.py</code> — added <code>POST /stories/generate</code> endpoint</li>
+<li><code>app/models/__init__.py</code> — registered <code>Child</code> model</li>
+<li><code>app/main.py</code> — registered <code>children_router</code></li>
+</ul>
+<h2 id="test-results-all-passed-">Test results (all passed ✅)</h2>
+<ul>
+<li><code>POST /children</code> → <code>201 Created</code> (created child profile)</li>
+<li><code>GET /children?parentId=parent-001</code> → <code>200 OK</code> (listed children)</li>
+<li><code>GET /children/1</code> → <code>200 OK</code> (got child by ID)</li>
+<li><code>PUT /children/1</code> → <code>200 OK</code> (updated child)</li>
+<li><code>POST /stories/generate</code> → <code>201 Created</code> (generated &amp; saved story)</li>
+<li><code>DELETE /children/1</code> → <code>204 No Content</code> (deleted)</li>
+<li><code>GET /children/1</code> after delete → <code>404 Not Found</code> (correct)</li>
+</ul>
+<h2 id="bonus-child-profile-endpoints-for-personalization-">Bonus: Child profile endpoints (for personalization)</h2>
+<p>Since story generation can use a <code>childId</code> for personalization, I also implemented the full child profile CRUD:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/children</code></td>
+<td>Create a child profile</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/children?parentId={id}</code></td>
+<td>List children for a parent</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/children/{childId}</code></td>
+<td>Get a child by ID</td>
+</tr>
+<tr>
+<td><code>PUT</code></td>
+<td><code>/children/{childId}</code></td>
+<td>Update a child (partial)</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/children/{childId}</code></td>
+<td>Delete a child</td>
+</tr>
+</tbody>
+</table>
+</body></html>

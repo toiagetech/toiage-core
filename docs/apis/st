@@ -1,0 +1,13 @@
+{
+  "method": "POST",
+  "path": "/stories/generate",
+  "summary": "Generate a personalized AI story",
+  "description": "Generate a personalized, age-appropriate story based on parent-selected parameters (goal, mood, length, theme, today's context) and optionally a child profile for personalization. The story is generated via the LLM and persisted to the database in a single call. Provider defaults to 'mock' (no API key required); set provider='openrouter' to use the real model.",
+  "tags": ["stories"],
+  "statusCodes": {
+    "201": "Story generated and saved successfully",
+    "404": "Prompt template not found",
+    "422": "Validation error (missing required fields)",
+    "400": "Invalid request (e.g., unknown LLM provider)"
+  }
+}

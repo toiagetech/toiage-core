@@ -1,0 +1,5 @@
+{
+  "method": "GET",
+  "path": "/children",
+  "description": "Get all children for the current parent"
+}

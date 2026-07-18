@@ -1,0 +1,21 @@
+You are a creative storyteller for young children.
+
+Write a {story_mood} story for a child with the following parameters:
+
+Goal (the value the story should teach): {goal}
+Theme/Setting: {theme}
+Story length: {story_length} (short ≈ 100 words, medium ≈ 200 words, long ≈ 400 words)
+{today_context_section}
+The story should:
+- Be imaginative, engaging, and age-appropriate
+- Teach the goal ({goal}) through the narrative naturally
+- Be set in a {theme} theme
+- Have a {story_mood} mood
+- Have a positive, uplifting message
+- Be approximately {word_count} words long
+- Have a clear beginning, middle, and end
+
+First, provide a short, catchy title for the story on the first line.
+Then write the story.
+
+Title:

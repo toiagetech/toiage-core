@@ -1,4 +1,4 @@
-"""Story CRUD endpoints."""
+"""Story generation and CRUD endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
@@ -6,24 +6,78 @@ from starlette import status
 
 from app.db.session import get_session
 from app.models.story import Story
-from app.schemas.story import StoryCreate, StoryRead
+from app.prompts import PromptNotFoundError
+from app.schemas.story import (
+    StoryCreate,
+    StoryGenerateRequest,
+    StoryGenerateResponse,
+    StoryRead,
+)
 from app.services.analytics import EVENT_STORY_GENERATED, analytics
+from app.services.stories import generate_story
 
 router = APIRouter(prefix="/stories", tags=["stories"])
+
+
+@router.post(
+    "/generate",
+    response_model=StoryGenerateResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Generate a personalized AI story",
+    description=(
+        "Generate a personalized, age-appropriate story based on parent-selected "
+        "parameters (goal, mood, length, theme, today's context) and optionally a "
+        "child profile for personalization. The story is generated via the LLM and "
+        "persisted to the database in a single call. "
+        "Provider defaults to 'mock' (no API key required); set provider='openrouter' "
+        "to use the real model."
+    ),
+    responses={
+        404: {"description": "Prompt template not found"},
+        422: {"description": "Validation error (missing required fields)"},
+        400: {"description": "Invalid request (e.g., unknown LLM provider)"},
+    },
+)
+async def generate_story_endpoint(
+    body: StoryGenerateRequest,
+    session: Session = Depends(get_session),
+):
+    """Generate a personalized story via the LLM and save it."""
+    try:
+        story = await generate_story(body, session)
+    except PromptNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    # Build response from the saved row + transient LLM provenance
+    return StoryGenerateResponse(
+        id=story.id,
+        title=story.title,
+        content=story.content,
+        goal=story.goal,
+        story_mood=story.story_mood,
+        story_length=story.story_length,
+        theme=story.theme,
+        today_context=story.today_context,
+        created_at=story.created_at,
+        provider=getattr(story, "_provider", body.provider),
+        model=getattr(story, "_model", "unknown"),
+    )
 
 
 @router.post(
     "",
     response_model=StoryRead,
     status_code=status.HTTP_201_CREATED,
-    summary="Create a story",
-    description="Save a new story to the database. The story content should be generated beforehand via the AI endpoint.",
+    summary="Create a story (legacy)",
+    description="Save a new story to the database. The story content should be generated beforehand, or use POST /stories/generate to do both in one call.",
     responses={
         422: {"description": "Validation error (missing required fields)"},
     },
 )
 async def create_story(body: StoryCreate, session: Session = Depends(get_session)):
-    """Create and save a new story."""
+    """Create and save a new story (legacy flow)."""
     story = Story(
         content=body.content,
         age_group=body.age_group,
