@@ -31,7 +31,7 @@ class Child(SQLModel, table=True):
 
     # ── Preferences ─────────────────────────────────────────────────
     preferred_language: str = Field(default="en", description="Preferred language code (e.g. en, hi)")
-    learning_style: str | None = Field(default=None, description="Learning style (e.g. visual, kinesthetic)")
+    learning_style: list | None = Field(default=None, sa_column=Column(JSON), description="Learning style(s) (e.g. ['audio', 'doing'])")
 
     # ── Arrays (stored as JSON) ─────────────────────────────────────
     interests: list | None = Field(default=None, sa_column=Column(JSON), description="Child's interests")

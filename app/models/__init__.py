@@ -1,5 +1,6 @@
 from app.models.activity import Activity
 from app.models.child import Child
+from app.models.parent import Parent
 from app.models.story import Story
 from app.models.upload import Upload
 from app.models.curriculum import CurriculumMaster
@@ -12,6 +13,7 @@ from app.models.prototype_master import PrototypeMaster
 __all__ = [
     "Activity",
     "Child",
+    "Parent",
     "Story",
     "Upload",
     "CurriculumMaster",

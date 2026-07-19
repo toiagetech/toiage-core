@@ -7,6 +7,7 @@ from sqlmodel import text
 from app.api.activities import router as activities_router
 from app.api.children import router as children_router
 from app.api.llm import router as llm_router
+from app.api.parents import router as parents_router
 from app.api.stories import router as stories_router
 from app.api.uploads import router as uploads_router
 from app.api.science_projects import router as science_projects_router
@@ -56,6 +57,7 @@ app.add_exception_handler(Exception, global_exception_handler)
 app.add_exception_handler(HTTPException, http_exception_handler)
 
 app.include_router(children_router)
+app.include_router(parents_router)
 app.include_router(llm_router)
 app.include_router(stories_router)
 app.include_router(activities_router)
