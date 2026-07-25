@@ -20,7 +20,7 @@ class Story(SQLModel, table=True):
     story_length: str | None = Field(default=None, description="Story length (e.g. short, medium, long)")
     theme: str = Field(nullable=False, index=True, description="Story theme/setting (e.g. forest, space)")
     today_context: str | None = Field(default=None, description="Optional context about the child's day")
-    language: str = Field(default="en", nullable=False, index=True, description="Language code of the story")
+    language: str = Field(default="en", nullable=False, index=True, description="Language code of the story (e.g. en, hi, or)")
     # Legacy fields (kept for backward compatibility with existing data/migrations)
     age_group: str = Field(default="", nullable=False, index=True)
     skills: str = Field(default="", nullable=False)

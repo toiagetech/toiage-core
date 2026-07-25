@@ -1,5 +1,6 @@
 """Observability helpers: request ID, latency tracking, structured logging."""
 
+import json
 import time
 import uuid
 from collections.abc import Awaitable, Callable
@@ -11,6 +12,45 @@ from app.services.llm.manager import request_id_var
 from app.utils.logger import get_logger
 
 logger = get_logger("app.observability")
+
+# Methods that typically have a request body worth capturing
+_BODY_METHODS = {"POST", "PUT", "PATCH"}
+# Max body size to capture for logging (to avoid huge payloads in logs)
+_MAX_BODY_CAPTURE = 4096
+
+
+async def _capture_request_body(request: Request) -> str | None:
+    """Read and return the request body as a string for logging purposes.
+
+    The body is read from the underlying stream and then re-injected so
+    that downstream handlers (endpoints, validation) can still access it.
+    Returns None for methods without a body or if the body is empty.
+    """
+    if request.method not in _BODY_METHODS:
+        return None
+
+    body_bytes = await request.body()
+    if not body_bytes:
+        return None
+
+    # Truncate very large bodies to keep logs manageable
+    if len(body_bytes) > _MAX_BODY_CAPTURE:
+        body_str = body_bytes[:_MAX_BODY_CAPTURE].decode("utf-8", errors="replace") + "...[truncated]"
+    else:
+        body_str = body_bytes.decode("utf-8", errors="replace")
+
+    # Re-inject the body so downstream can read it again
+    async def receive() -> dict:
+        return {"type": "http.request", "body": body_bytes, "more_body": False}
+
+    request._receive = receive  # type: ignore[attr-defined]
+
+    # Try to pretty-print JSON for readability
+    try:
+        parsed = json.loads(body_str)
+        return json.dumps(parsed, ensure_ascii=False)
+    except (json.JSONDecodeError, ValueError):
+        return body_str
 
 
 class ObservabilityMiddleware(BaseHTTPMiddleware):
@@ -24,17 +64,21 @@ class ObservabilityMiddleware(BaseHTTPMiddleware):
         request_id = str(uuid.uuid4())[:8]
         request.state.request_id = request_id
 
+        # Capture the request body BEFORE calling the endpoint so it is
+        # available even when validation fails (422) before the handler runs.
+        request_body = await _capture_request_body(request)
+
         # Propagate request_id to LLM manager via contextvar
         token = request_id_var.set(request_id)
         start = time.monotonic()
         try:
             response = await call_next(request)
             elapsed = time.monotonic() - start
-            _log_request(request, response, elapsed, request_id)
+            _log_request(request, response, elapsed, request_id, request_body=request_body)
             return response
         except Exception as exc:
             elapsed = time.monotonic() - start
-            _log_request(request, None, elapsed, request_id, error=str(exc))
+            _log_request(request, None, elapsed, request_id, error=str(exc), request_body=request_body)
             raise
         finally:
             request_id_var.reset(token)
@@ -61,6 +105,7 @@ def _log_request(
     elapsed_s: float,
     request_id: str,
     error: str | None = None,
+    request_body: str | None = None,
 ) -> None:
     elapsed_ms = round(elapsed_s * 1000, 2)
     extra = {
@@ -73,6 +118,11 @@ def _log_request(
         "user_agent": request.headers.get("user-agent", ""),
         "content_type": request.headers.get("content-type", ""),
     }
+
+    # Include the request payload for failed requests (4xx/5xx) and
+    # exceptions so we can debug validation errors and crashes.
+    if request_body:
+        extra["request_body"] = request_body
 
     if response is not None:
         extra["status"] = response.status_code

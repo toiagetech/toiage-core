@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Untitled Document.md</title>
+  <style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.css");
+
+  body {
+    font-family: Georgia, Cambria, serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #373D49;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.25em; }
+  a { color: #35D7BB; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "Ubuntu Mono", Monaco, monospace;
+    background: #F5F7FA;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+  pre {
+    background: #F5F7FA;
+    padding: 1em;
+    border-radius: 3px;
+    overflow-x: auto;
+  }
+  .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0;
+    color: #333;
+  }
+  pre code { background: none; padding: 0; }
+  blockquote {
+    border-left: 3px solid #A0AABF;
+    padding-left: 1em;
+    margin-left: 0;
+    font-style: italic;
+    color: #666;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #E8E8E8;
+    padding: 0.5em;
+    text-align: left;
+  }
+  th {
+    background: #F5F7FA;
+    font-weight: 600;
+  }
+  #preview .table {
+    width: auto;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+</style>
+</head>
+<body id="preview">
+<h2 class="code-line has-line-data" data-line-start="0" data-line-end="1"><a id="Language_Selection_Feature_Backend_Complete_Verified_0"></a>Language Selection Feature — Backend Complete &amp; Verified</h2>
+<h3 class="code-line has-line-data" data-line-start="2" data-line-end="3"><a id="Verified_Result_Hindi_Story_2"></a>Verified Result (Hindi Story)</h3>
+<pre><code class="has-line-data" data-line-start="4" data-line-end="13">Provider: openrouter
+Model: google/gemini-3.5-flash-lite
+Language: hi
+Title: नन्हे दोस्तों की प्यारी रात
+Content: एक सुंदर हरे-भरे जंगल में, चाँदनी रात छाई थी। सभी जानवर अपनी-अपनी कोटरों में सोने की तैयारी कर रहे थे। एक नन्हा खरगोश पिंकी बहुत उदास था...
+Content length: 656 chars
+Cost: $0.0007
+Response time: 2 seconds
+</code></pre>
+<p class="has-line-data" data-line-start="14" data-line-end="15">The LLM generated the <strong>entire story in Hindi</strong> (Devanagari script) — title and content both in Hindi!</p>
+<h3 class="code-line has-line-data" data-line-start="16" data-line-end="17"><a id="All_Changes_Made_16"></a>All Changes Made</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>app/schemas/story.py</code></td>
+<td>Added <code>language: str = Field(default=&quot;en&quot;)</code> to <code>StoryGenerateRequest</code>, <code>StoryGenerateResponse</code>, and <code>StoryRead</code></td>
+</tr>
+<tr>
+<td><code>app/models/story.py</code></td>
+<td>Added <code>language: str = Field(default=&quot;en&quot;, nullable=False, index=True)</code> column to <code>Story</code> model</td>
+</tr>
+<tr>
+<td><code>alembic/versions/c3d4e5f6a7b8_add_language_to_stories.py</code></td>
+<td>New migration: adds <code>language</code> column + index to <code>stories</code> table</td>
+</tr>
+<tr>
+<td><code>app/prompts/stories/generate.txt</code></td>
+<td>Added <code>{language_name}</code> placeholder: “Write the ENTIRE story in {language_name} language”</td>
+</tr>
+<tr>
+<td><code>app/services/stories.py</code></td>
+<td>Added <code>LANGUAGE_MAP</code> (13 languages), <code>_resolve_language()</code> (explicit &gt; child profile &gt; default), passes <code>language_name</code> to prompt, saves <code>language</code> to DB, filters by <code>language</code> in db mode</td>
+</tr>
+<tr>
+<td><code>app/api/stories.py</code></td>
+<td>Added <code>language=getattr(story, &quot;language&quot;, &quot;en&quot;)</code> to response</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="27" data-line-end="28"><a id="Supported_Languages_13_English_27"></a>Supported Languages (13 + English)</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Code</th>
+<th>Language</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>en</code></td>
+<td>English</td>
+</tr>
+<tr>
+<td><code>hi</code></td>
+<td>Hindi ✅</td>
+</tr>
+<tr>
+<td><code>or</code></td>
+<td>Odia</td>
+</tr>
+<tr>
+<td><code>bn</code></td>
+<td>Bengali</td>
+</tr>
+<tr>
+<td><code>ta</code></td>
+<td>Tamil</td>
+</tr>
+<tr>
+<td><code>te</code></td>
+<td>Telugu</td>
+</tr>
+<tr>
+<td><code>mr</code></td>
+<td>Marathi</td>
+</tr>
+<tr>
+<td><code>gu</code></td>
+<td>Gujarati</td>
+</tr>
+<tr>
+<td><code>kn</code></td>
+<td>Kannada</td>
+</tr>
+<tr>
+<td><code>ml</code></td>
+<td>Malayalam</td>
+</tr>
+<tr>
+<td><code>pa</code></td>
+<td>Punjabi</td>
+</tr>
+<tr>
+<td><code>ur</code></td>
+<td>Urdu</td>
+</tr>
+<tr>
+<td><code>sa</code></td>
+<td>Sanskrit</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="44" data-line-end="45"><a id="How_It_Works_44"></a>How It Works</h3>
+<pre><code class="has-line-data" data-line-start="46" data-line-end="62">POST /stories/generate
+  body: { &quot;language&quot;: &quot;hi&quot;, &quot;childId&quot;: 13, &quot;goal&quot;: &quot;friendship&quot;, ... }
+       ↓
+Backend resolves language:
+  1. body.language = &quot;hi&quot; → use it (explicit selection)
+  2. (if not sent) child.preferred_language → use it
+  3. (if neither) default = &quot;en&quot;
+       ↓
+Prompt: &quot;Write the ENTIRE story in Hindi language.&quot;
+       ↓
+LLM generates story in Hindi (Devanagari script)
+       ↓
+Saved to DB: language=&quot;hi&quot;
+       ↓
+Response: { &quot;language&quot;: &quot;hi&quot;, &quot;title&quot;: &quot;नन्हे दोस्तों की प्यारी रात&quot;, ... }
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="63" data-line-end="64"><a id="Language_Resolution_Priority_63"></a>Language Resolution Priority</h3>
+<ol>
+<li class="has-line-data" data-line-start="64" data-line-end="65"><strong>Explicit selection</strong> (<code>body.language</code>) — overrides everything</li>
+<li class="has-line-data" data-line-start="65" data-line-end="66"><strong>Child profile</strong> (<code>child.preferred_language</code>) — fallback if not explicitly set</li>
+<li class="has-line-data" data-line-start="66" data-line-end="68"><strong>Default</strong> (<code>&quot;en&quot;</code>) — final fallback</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="68" data-line-end="69"><a id="DB_Mode_Enhancement_68"></a>DB Mode Enhancement</h3>
+<p class="has-line-data" data-line-start="69" data-line-end="70">In “db” mode, the query filters by language too:</p>
+<pre><code class="has-line-data language-python" data-line-start="71" data-line-end="77">_query = _select(Story).where(
+    Story.goal == body.goal,
+    Story.theme == body.theme,
+    Story.language == resolved_language,  <span class="hljs-comment"># ← ensures Hindi request gets Hindi story</span>
+)
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="78" data-line-end="79"><a id="Test_Command_78"></a>Test Command</h3>
+<pre><code class="has-line-data language-bash" data-line-start="80" data-line-end="84">curl -s -X POST <span class="hljs-string">&quot;http://localhost:8000/stories/generate&quot;</span> \
+  -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> \
+  -d <span class="hljs-string">&#x27;{&quot;childId&quot;:13,&quot;goal&quot;:&quot;friendship&quot;,&quot;storyMood&quot;:&quot;bedtime&quot;,&quot;storyLength&quot;:&quot;short&quot;,&quot;theme&quot;:&quot;forest&quot;,&quot;language&quot;:&quot;hi&quot;}&#x27;</span>
+</code></pre>
+<h2 class="code-line has-line-data" data-line-start="85" data-line-end="86"><a id="Language_Selection_Feature_Frontend_Backend_Complete_85"></a>Language Selection Feature — Frontend &amp; Backend Complete</h2>
+<h3 class="code-line has-line-data" data-line-start="87" data-line-end="88"><a id="Verified_Result_Odia_Story_87"></a>Verified Result (Odia Story)</h3>
+<pre><code class="has-line-data" data-line-start="89" data-line-end="96">Provider: openrouter
+Model: google/gemini-3.5-flash-lite
+Language: or
+Title: ବଣର ସୁନା ବନ୍ଧୁ
+Content: ଏକ ସୁନ୍ଦର ଗ୍ରୀନ ଜଙ୍ଗଳରେ, ମିଠୁ ନାମକ ଏକ ଛୋଟ ମିଠା ଖାଦ୍ୟପ୍ରିୟ ହରିଣ ରହୁଥିଲା...
+Content length: 504 chars
+</code></pre>
+<p class="has-line-data" data-line-start="97" data-line-end="98">The LLM generated the <strong>entire story in Odia</strong> (Oriya script) — title and content both in Odia!</p>
+<h3 class="code-line has-line-data" data-line-start="99" data-line-end="100"><a id="Frontend_Changes_toiageapp_99"></a>Frontend Changes (<code>toiage-app</code>)</h3>
+<p class="has-line-data" data-line-start="101" data-line-end="102"><strong><code>src/features/story/types/story.ts</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="102" data-line-end="104">Added <code>language?: string</code> to <code>GenerateStoryRequest</code> and <code>Story</code> interfaces</li>
+</ul>
+<p class="has-line-data" data-line-start="104" data-line-end="105"><strong><code>src/features/story/components/StoryGeneratorForm.tsx</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="105" data-line-end="106">Added <code>LANGUAGE_OPTIONS</code> array with 13 languages (English default + 12 Indian languages)</li>
+<li class="has-line-data" data-line-start="106" data-line-end="107">Added <code>language</code> state (defaults to <code>&quot;en&quot;</code>)</li>
+<li class="has-line-data" data-line-start="107" data-line-end="108">Added language <code>&lt;SelectField&gt;</code> dropdown at the top of the form (before Goal)</li>
+<li class="has-line-data" data-line-start="108" data-line-end="109">Passes <code>language</code> in the <code>onGenerate</code> payload</li>
+<li class="has-line-data" data-line-start="109" data-line-end="111">Fixed prop type: <code>Omit&lt;GenerateStoryRequest, &quot;childId&quot;&gt;</code> (childId is added by AIStoryShortcut)</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="111" data-line-end="112"><a id="Language_Dropdown_Options_111"></a>Language Dropdown Options</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Code</th>
+<th>Label</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>en</code></td>
+<td>🇬🇧 English (default)</td>
+</tr>
+<tr>
+<td><code>hi</code></td>
+<td>🇮🇳 Hindi</td>
+</tr>
+<tr>
+<td><code>or</code></td>
+<td>🇮🇳 Odia</td>
+</tr>
+<tr>
+<td><code>bn</code></td>
+<td>🇮🇳 Bengali</td>
+</tr>
+<tr>
+<td><code>ta</code></td>
+<td>🇮🇳 Tamil</td>
+</tr>
+<tr>
+<td><code>te</code></td>
+<td>🇮🇳 Telugu</td>
+</tr>
+<tr>
+<td><code>mr</code></td>
+<td>🇮🇳 Marathi</td>
+</tr>
+<tr>
+<td><code>gu</code></td>
+<td>🇮🇳 Gujarati</td>
+</tr>
+<tr>
+<td><code>kn</code></td>
+<td>🇮🇳 Kannada</td>
+</tr>
+<tr>
+<td><code>ml</code></td>
+<td>🇮🇳 Malayalam</td>
+</tr>
+<tr>
+<td><code>pa</code></td>
+<td>🇮🇳 Punjabi</td>
+</tr>
+<tr>
+<td><code>ur</code></td>
+<td>🇮🇳 Urdu</td>
+</tr>
+<tr>
+<td><code>sa</code></td>
+<td>🇮🇳 Sanskrit</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="128" data-line-end="129"><a id="Backend_Changes_toiagecore_128"></a>Backend Changes (<code>toiage-core</code>)</h3>
+<ul>
+<li class="has-line-data" data-line-start="129" data-line-end="130"><code>app/schemas/story.py</code> — Added <code>language</code> field to request/response schemas</li>
+<li class="has-line-data" data-line-start="130" data-line-end="131"><code>app/models/story.py</code> — Added <code>language</code> column to Story model</li>
+<li class="has-line-data" data-line-start="131" data-line-end="132"><code>alembic/versions/c3d4e5f6a7b8_add_language_to_stories.py</code> — Migration for language column</li>
+<li class="has-line-data" data-line-start="132" data-line-end="133"><code>app/prompts/stories/generate.txt</code> — Added <code>{language_name}</code> placeholder</li>
+<li class="has-line-data" data-line-start="133" data-line-end="134"><code>app/services/stories.py</code> — Language resolution (explicit &gt; child profile &gt; default), passes to prompt, saves to DB, filters in db mode</li>
+<li class="has-line-data" data-line-start="134" data-line-end="136"><code>app/api/stories.py</code> — Passes <code>language</code> in response</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="136" data-line-end="137"><a id="How_It_Works_136"></a>How It Works</h3>
+<pre><code class="has-line-data" data-line-start="138" data-line-end="154">Parent selects &quot;Odia&quot; in language dropdown
+      ↓
+Frontend sends: { &quot;language&quot;: &quot;or&quot;, &quot;childId&quot;: 13, &quot;goal&quot;: &quot;friendship&quot;, ... }
+      ↓
+AIStoryShortcut merges childId: { ...payload, childId: Number(activeChildId) }
+      ↓
+Backend resolves: language=&quot;or&quot; → &quot;Odia&quot;
+      ↓
+Prompt: &quot;Write the ENTIRE story in Odia language.&quot;
+      ↓
+LLM generates story in Odia (Oriya script)
+      ↓
+Saved to DB: language=&quot;or&quot;
+      ↓
+Frontend displays Odia story
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="155" data-line-end="156"><a id="Build_Status_155"></a>Build Status</h3>
+<ul>
+<li class="has-line-data" data-line-start="156" data-line-end="157">✅ Frontend build succeeded (no TS errors)</li>
+<li class="has-line-data" data-line-start="157" data-line-end="158">✅ Backend test with Hindi — story generated in Hindi (Devanagari)</li>
+<li class="has-line-data" data-line-start="158" data-line-end="159">✅ Backend test with Odia — story generated in Odia (Oriya script)</li>
+</ul>
+
+</body>
+</html>

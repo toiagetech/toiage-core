@@ -20,7 +20,7 @@ class StoryGenerateRequest(BaseModel):
     story_length: str = Field(..., alias="storyLength", description="The length of the story", examples=["short"])
     theme: str = Field(..., description="The theme/setting of the story", examples=["forest"])
     today_context: str | None = Field(default=None, alias="todayContext", description="Optional context about the child's day", examples=["Aria was feeling lonely because her best friend did not play with her today."])
-    language: str = Field(default="en", description="Language code for the story (e.g. en, hi, or)", examples=["en", "hi", "or"])
+    language: str = Field(default="en", description="Language code for the story (e.g. en, hi, bn, ta, te, mr, gu, kn, ml, pa, ur, or, sa)", examples=["en", "hi", "or"])
 
     # Optional: link to a child profile for personalization
     child_id: int | None = Field(default=None, alias="childId", description="Optional child ID for personalization")
@@ -47,7 +47,7 @@ class StoryGenerateResponse(BaseModel):
     story_length: str | None = Field(default=None, alias="storyLength", description="Story length")
     theme: str = Field(..., description="Story theme/setting")
     today_context: str | None = Field(default=None, alias="todayContext", description="Today's context")
-    language: str = Field(default="en", description="Language code of the story")
+    language: str = Field(default="en", description="Language code of the story (e.g. en, hi, or)")
     created_at: datetime = Field(..., alias="created_at", description="When the story was created")
     provider: str = Field(..., description="The LLM provider that generated the story", examples=["mock", "openrouter"])
     model: str = Field(..., description="The model that generated the story", examples=["mock-model-v1"])
@@ -63,6 +63,7 @@ class StoryGenerateResponse(BaseModel):
                 "storyLength": "short",
                 "theme": "forest",
                 "todayContext": "Aria was feeling lonely because her best friend did not play with her today.",
+                "language": "en",
                 "created_at": "2026-07-18T11:00:00Z",
                 "provider": "mock",
                 "model": "mock-model-v1",
@@ -93,7 +94,7 @@ class StoryRead(BaseModel):
     story_length: str | None = Field(default=None, alias="storyLength", description="Story length")
     theme: str = Field(..., description="Story theme")
     today_context: str | None = Field(default=None, alias="todayContext", description="Today's context")
-    language: str = Field(default="en", description="Language code of the story")
+    language: str = Field(default="en", description="Language code of the story (e.g. en, hi, or)")
     age_group: str = Field(default="", description="Target age group (legacy)")
     skills: str = Field(default="", description="Skills developed (legacy)")
     difficulty: str = Field(default="beginner", description="Reading difficulty (legacy)")

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Untitled Document.md</title>
+  <style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.css");
+
+  body {
+    font-family: Georgia, Cambria, serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #373D49;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.25em; }
+  a { color: #35D7BB; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "Ubuntu Mono", Monaco, monospace;
+    background: #F5F7FA;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+  pre {
+    background: #F5F7FA;
+    padding: 1em;
+    border-radius: 3px;
+    overflow-x: auto;
+  }
+  .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0;
+    color: #333;
+  }
+  pre code { background: none; padding: 0; }
+  blockquote {
+    border-left: 3px solid #A0AABF;
+    padding-left: 1em;
+    margin-left: 0;
+    font-style: italic;
+    color: #666;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #E8E8E8;
+    padding: 0.5em;
+    text-align: left;
+  }
+  th {
+    background: #F5F7FA;
+    font-weight: 600;
+  }
+  #preview .table {
+    width: auto;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+</style>
+</head>
+<body id="preview">
+<p class="has-line-data" data-line-start="0" data-line-end="1">Added comprehensive structured logging to the story generation module. Every request now produces a full audit trail across 3 layers (API → Service → LLM Manager).</p>
+<h2 class="code-line has-line-data" data-line-start="2" data-line-end="3"><a id="What_gets_logged_in_order_2"></a>What gets logged (in order)</h2>
+<h3 class="code-line has-line-data" data-line-start="4" data-line-end="5"><a id="1_API_Layer_appapistoriespy_appapistories_logger_4"></a>1. API Layer (<code>app/api/stories.py</code>) — <code>app.api.stories</code> logger</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Log</th>
+<th>What’s captured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>“Story generation request received”</strong></td>
+<td>Full request payload (goal, mood, length, theme, todayContext, childId, provider, temperature, max_tokens)</td>
+</tr>
+<tr>
+<td><strong>“Story generation response sent”</strong></td>
+<td>story_id, provider, model, title, content_length, content_preview (first 200 chars)</td>
+</tr>
+<tr>
+<td>Error logs</td>
+<td>Prompt not found (404), invalid request (400)</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="11" data-line-end="12"><a id="2_Service_Layer_appservicesstoriespy_appservicesstories_logger_11"></a>2. Service Layer (<code>app/services/stories.py</code>) — <code>app.services.stories</code> logger</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Log</th>
+<th>What’s captured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>“Child profile loaded for personalization”</strong></td>
+<td>child_id, name, nick_name, interests, special_notes</td>
+</tr>
+<tr>
+<td><strong>“Child profile not found”</strong> (warning)</td>
+<td>child_id (if lookup fails)</td>
+</tr>
+<tr>
+<td><strong>“No child_id provided”</strong></td>
+<td>When generating without personalization</td>
+</tr>
+<tr>
+<td><strong>“Prompt built for LLM”</strong></td>
+<td>prompt_template, word_count_target, prompt_length, prompt_preview (first 200 chars)</td>
+</tr>
+<tr>
+<td><strong>“Calling LLM”</strong></td>
+<td>provider, temperature, max_tokens</td>
+</tr>
+<tr>
+<td><strong>“LLM response received”</strong></td>
+<td>provider, <strong>model</strong>, response_length, response_preview, usage (tokens)</td>
+</tr>
+<tr>
+<td><strong>“Parsed title and content”</strong></td>
+<td>title, content_length</td>
+</tr>
+<tr>
+<td><strong>“Story saved to database”</strong></td>
+<td>story_id, title, content_length, goal, theme</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="23" data-line-end="24"><a id="3_LLM_Manager_appservicesllmmanagerpy_appllmmanager_logger_already_existed_23"></a>3. LLM Manager (<code>app/services/llm/manager.py</code>) — <code>app.llm.manager</code> logger (already existed)</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Log</th>
+<th>What’s captured</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>“AI call”</strong></td>
+<td>request_id, provider, <strong>model</strong>, prompt_preview, prompt_tokens, temperature, max_tokens</td>
+</tr>
+<tr>
+<td><strong>“AI response”</strong></td>
+<td>request_id, provider, <strong>model</strong>, response_preview, elapsed_ms, latency_bucket, input/output/total tokens, usage</td>
+</tr>
+<tr>
+<td><strong>“AI call failed”</strong> (error)</td>
+<td>provider, model, elapsed_ms, error</td>
+</tr>
+<tr>
+<td><strong>“AI response blocked by safety filter”</strong> (warning)</td>
+<td>provider, model, reason, response_preview</td>
+</tr>
+</tbody>
+</table>
+<h2 class="code-line has-line-data" data-line-start="31" data-line-end="32"><a id="Sample_log_output_from_test_31"></a>Sample log output (from test)</h2>
+<pre><code class="has-line-data language-json" data-line-start="34" data-line-end="44"><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;app.api.stories&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Story generation request received&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;request_payload&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;goal&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;entertain&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;storyMood&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;happy&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;storyLength&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;short&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;theme&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;space adventure&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;todayContext&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;bedtime&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;childId&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">10</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;provider&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;mock&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;temperature&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0.7</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;max_tokens&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1024</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;app.services.stories&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Child profile loaded for personalization&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;child_id&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">10</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;child_name&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;manas&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;child_interests&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-string">&quot;space&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-string">&quot;machine&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;app.services.stories&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Prompt built for LLM&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;prompt_template&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;stories/generate&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;prompt_length&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">2312</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;prompt_preview&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;You are ToiageCore...&quot;</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;app.services.stories&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Calling LLM&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;provider&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;mock&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;temperature&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0.7</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;max_tokens&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1024</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;app.llm.manager&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;AI call&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;provider&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;mock&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;model&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;mock-model-v1&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;prompt_tokens&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">373</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;app.llm.manager&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;AI response&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;provider&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;mock&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;model&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;mock-model-v1&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;response_preview&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;Hello little explorer!&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;elapsed_ms&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0.54</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;input_tokens&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">373</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;output_tokens&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">3</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;app.services.stories&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;LLM response received&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;provider&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;mock&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;model&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;mock-model-v1&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;response_length&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">22</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;usage&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;prompt_tokens&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">373</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;completion_tokens&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">3</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;app.services.stories&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Story saved to database&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;story_id&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">19</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;title&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;Hello little explorer!&quot;</span><span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">{</span><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;app.api.stories&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Story generation response sent&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;story_id&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">19</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;provider&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;mock&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;model&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;mock-model-v1&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;content_length&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">0</span><span class="hljs-punctuation">}</span>
+</code></pre>
+<p class="has-line-data" data-line-start="45" data-line-end="46">All logs are <strong>structured JSON</strong> (via <code>app/utils/logger.py</code>) and go to stdout — viewable in the terminal or <code>/tmp/toiage-core.log</code>. When you switch to <code>provider: &quot;openrouter&quot;</code>, the logs will show the real model name (e.g., <code>google/gemini-2.0-flash-001</code>) and actual token usage.</p>
+<h2 class="code-line has-line-data" data-line-start="47" data-line-end="48"><a id="Files_modified_47"></a>Files modified</h2>
+<ol>
+<li class="has-line-data" data-line-start="48" data-line-end="49"><strong><code>app/api/stories.py</code></strong> — Added request payload + response payload logging to <code>generate_story_endpoint</code></li>
+<li class="has-line-data" data-line-start="49" data-line-end="51"><strong><code>app/services/stories.py</code></strong> — Added 7 log points: child profile load, prompt build, LLM call, LLM response, title/content parse, story save</li>
+</ol>
+<p class="has-line-data" data-line-start="51" data-line-end="52">The server is running at <code>http://localhost:8000</code> — test story generation in Postman and watch the logs in the terminal.</p>
+<h2 class="code-line has-line-data" data-line-start="55" data-line-end="56"><a id="Story_Generation_childId_Null_Issue_Fixed_toiageapp_55"></a>Story Generation <code>childId</code> Null Issue — Fixed- toiageapp</h2>
+<h3 class="code-line has-line-data" data-line-start="57" data-line-end="58"><a id="Root_Cause_57"></a>Root Cause</h3>
+<p class="has-line-data" data-line-start="58" data-line-end="59">When clicking “Generate Story”, the app called <code>POST /stories/generate</code> but <strong><code>childId</code> was null</strong> because:</p>
+<ol>
+<li class="has-line-data" data-line-start="60" data-line-end="62">
+<p class="has-line-data" data-line-start="60" data-line-end="61"><strong><code>GenerateStoryRequest</code> type was missing <code>childId</code></strong> — The type only had <code>goal</code>, <code>storyMood</code>, <code>storyLength</code>, <code>theme</code>, <code>todayContext</code> — no <code>childId</code> field at all.</p>
+</li>
+<li class="has-line-data" data-line-start="62" data-line-end="64">
+<p class="has-line-data" data-line-start="62" data-line-end="63"><strong><code>AIStoryShortcut.tsx</code> didn’t pass the active child ID</strong> — It called <code>generateStory(payload)</code> without injecting the active child’s ID.</p>
+</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="64" data-line-end="65"><a id="Changes_Made_64"></a>Changes Made</h3>
+<p class="has-line-data" data-line-start="66" data-line-end="67"><strong><code>src/features/story/types/story.ts</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="67" data-line-end="69">Added <code>childId: string</code> as the first field of <code>GenerateStoryRequest</code> (required field)</li>
+</ul>
+<p class="has-line-data" data-line-start="69" data-line-end="70"><strong><code>src/features/home/components/AIStoryShortcut.tsx</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="70" data-line-end="71">Added import: <code>import { useActiveChild } from &quot;../../child-profile/hooks/useActiveChild&quot;</code></li>
+<li class="has-line-data" data-line-start="71" data-line-end="72">Added hook call: <code>const { activeChildId } = useActiveChild()</code></li>
+<li class="has-line-data" data-line-start="72" data-line-end="76">Updated <code>handleGenerate</code> to:
+<ul>
+<li class="has-line-data" data-line-start="73" data-line-end="74">Guard against null: if no active child is selected, show an alert and return early</li>
+<li class="has-line-data" data-line-start="74" data-line-end="76">Inject the child ID: <code>generateStory({ ...payload, childId: activeChildId })</code></li>
+</ul>
+</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="76" data-line-end="77"><a id="How_It_Works_Now_76"></a>How It Works Now</h3>
+<ol>
+<li class="has-line-data" data-line-start="77" data-line-end="78">Parent selects a child on the Children page → <code>activeChildId</code> is stored in <code>activeChildStore</code> (persisted to localStorage)</li>
+<li class="has-line-data" data-line-start="78" data-line-end="79">Parent clicks “Generate Story” on the dashboard → <code>AIStoryShortcut</code> reads <code>activeChildId</code> from the store</li>
+<li class="has-line-data" data-line-start="79" data-line-end="80">The payload sent to <code>POST /stories/generate</code> now includes <code>childId: &quot;&lt;active child id&gt;&quot;</code> as a string</li>
+<li class="has-line-data" data-line-start="80" data-line-end="82">Backend uses the <code>childId</code> to fetch the child profile and generate a personalized story</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="82" data-line-end="83"><a id="Build_Status_82"></a>Build Status</h3>
+<p class="has-line-data" data-line-start="83" data-line-end="84">✅ Production build succeeded — 302 modules transformed, no errors.</p>
+<h3 class="code-line has-line-data" data-line-start="85" data-line-end="86"><a id="Note_85"></a>Note</h3>
+<p class="has-line-data" data-line-start="86" data-line-end="87">If no child is selected (no active child), the user will see an alert: “Please select a child first before generating a story.” — preventing the null <code>childId</code> from ever being sent to the backend.</p>
+<h2 class="code-line has-line-data" data-line-start="88" data-line-end="89"><a id="Payload_Logging_for_Failed_Requests_Fixed_88"></a>Payload Logging for Failed Requests — Fixed</h2>
+<h3 class="code-line has-line-data" data-line-start="90" data-line-end="91"><a id="Issue_90"></a>Issue</h3>
+<p class="has-line-data" data-line-start="91" data-line-end="92">When <code>POST /stories/generate</code> returned a 422 error, the request payload was <strong>not captured in the logs</strong>. This happened because:</p>
+<ol>
+<li class="has-line-data" data-line-start="92" data-line-end="93">FastAPI’s 422 validation errors occur <strong>before</strong> the endpoint handler runs, so the handler’s <code>logger.info(&quot;Story generation request received&quot;, ...)</code> never executes</li>
+<li class="has-line-data" data-line-start="93" data-line-end="95">The <code>ObservabilityMiddleware</code> only logged request metadata (method, path, status) but <strong>not the request body</strong></li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="95" data-line-end="96"><a id="Changes_Made_95"></a>Changes Made</h3>
+<p class="has-line-data" data-line-start="97" data-line-end="98"><strong><code>app/utils/observability.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="98" data-line-end="103">Added <code>_capture_request_body()</code> function that:
+<ul>
+<li class="has-line-data" data-line-start="99" data-line-end="100">Reads the request body for POST/PUT/PATCH methods</li>
+<li class="has-line-data" data-line-start="100" data-line-end="101">Re-injects the body into the request stream so downstream handlers can still access it</li>
+<li class="has-line-data" data-line-start="101" data-line-end="102">Pretty-prints JSON for readability</li>
+<li class="has-line-data" data-line-start="102" data-line-end="103">Truncates bodies larger than 4KB to keep logs manageable</li>
+</ul>
+</li>
+<li class="has-line-data" data-line-start="103" data-line-end="104">Updated <code>ObservabilityMiddleware.dispatch()</code> to capture the body <strong>before</strong> calling the endpoint</li>
+<li class="has-line-data" data-line-start="104" data-line-end="106">Updated <code>_log_request()</code> to include <code>request_body</code> in the log <code>extra</code> dict for all requests (especially 4xx/5xx failures and exceptions)</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="106" data-line-end="107"><a id="How_It_Works_Now_106"></a>How It Works Now</h3>
+<ol>
+<li class="has-line-data" data-line-start="107" data-line-end="108">Request arrives at middleware → body is captured and re-injected</li>
+<li class="has-line-data" data-line-start="108" data-line-end="109">If validation fails (422) → middleware logs the request <strong>with the payload</strong> as <code>request_body</code> in the log extra fields</li>
+<li class="has-line-data" data-line-start="109" data-line-end="110">If the handler succeeds → middleware logs normally (body also included for 2xx)</li>
+<li class="has-line-data" data-line-start="110" data-line-end="112">If an exception occurs → middleware logs the error <strong>with the payload</strong></li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="112" data-line-end="113"><a id="Log_Output_Example_422_112"></a>Log Output Example (422)</h3>
+<pre><code class="has-line-data language-json" data-line-start="114" data-line-end="126"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;timestamp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;level&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;WARNING&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;app.observability&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;API request 4xx&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;request_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;abc123&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;method&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;POST&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;path&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/stories/generate&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">422</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;request_body&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;{\&quot;childId\&quot;:13,\&quot;theme\&quot;:\&quot;forest\&quot;}&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="127" data-line-end="128"><a id="Important_Restart_Required_127"></a>Important: Restart Required</h3>
+<p class="has-line-data" data-line-start="128" data-line-end="129">The backend server must be <strong>restarted</strong> for the middleware changes to take effect:</p>
+<pre><code class="has-line-data language-bash" data-line-start="130" data-line-end="133"><span class="hljs-comment"># Stop the current server, then restart:</span>
+uv run uvicorn app.main:app --reload --port 8000
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="134" data-line-end="135"><a id="Frontend_Changes_from_earlier_134"></a>Frontend Changes (from earlier)</h3>
+<ul>
+<li class="has-line-data" data-line-start="135" data-line-end="136"><code>src/features/story/types/story.ts</code> — Added <code>childId: number</code> to <code>GenerateStoryRequest</code></li>
+<li class="has-line-data" data-line-start="136" data-line-end="138"><code>src/features/home/components/AIStoryShortcut.tsx</code> — Passes <code>childId: Number(activeChildId)</code> from the active child store</li>
+</ul>
+<h2 class="code-line has-line-data" data-line-start="138" data-line-end="139"><a id="Switch_from_Mock_to_Real_LLM_Backend_Configuration_138"></a>Switch from Mock to Real LLM — Backend Configuration</h2>
+<h3 class="code-line has-line-data" data-line-start="140" data-line-end="141"><a id="Changes_Made_140"></a>Changes Made</h3>
+<p class="has-line-data" data-line-start="142" data-line-end="143"><strong><code>app/core/config.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="143" data-line-end="145">Added <code>LLM_PROVIDER: str = &quot;mock&quot;</code> setting — the backend now decides which LLM provider to use, not the frontend</li>
+</ul>
+<p class="has-line-data" data-line-start="145" data-line-end="146"><strong><code>app/services/stories.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="146" data-line-end="147">Added <code>from app.core.config import settings</code> import</li>
+<li class="has-line-data" data-line-start="147" data-line-end="149">Changed <code>body.provider</code> → <code>settings.LLM_PROVIDER</code> in both the log statement (line 179) and the <code>llm_manager.generate()</code> call (line 186)</li>
+</ul>
+<p class="has-line-data" data-line-start="149" data-line-end="150"><strong><code>.env</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="150" data-line-end="152">Added <code>LLM_PROVIDER=mock</code> (current default)</li>
+</ul>
+<p class="has-line-data" data-line-start="152" data-line-end="153"><strong><code>.env.example</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="153" data-line-end="155">Added <code>LLM_PROVIDER=mock</code> with documentation comments explaining the options</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="155" data-line-end="156"><a id="How_to_Switch_to_a_Real_Model_155"></a>How to Switch to a Real Model</h3>
+<p class="has-line-data" data-line-start="157" data-line-end="158">To use a real LLM instead of mock, update the backend <code>.env</code> file:</p>
+<pre><code class="has-line-data language-env" data-line-start="160" data-line-end="178"># Option 1: OpenRouter (recommended — access many models)
+LLM_PROVIDER=openrouter
+OPENROUTER_API_KEY=sk-or-v1-your-key-here
+LLM_DEFAULT_MODEL=google/gemini-2.0-flash-001
+
+# Option 2: DeepSeek
+LLM_PROVIDER=deepseek
+DEEPSEEK_API_KEY=your-key-here
+
+# Option 3: OpenAI (requires optional dependency)
+LLM_PROVIDER=openai
+
+# Option 4: Gemini (requires optional dependency)
+LLM_PROVIDER=gemini
+
+# Option 5: Ollama (local, requires optional dependency)
+LLM_PROVIDER=ollama
+</code></pre>
+<p class="has-line-data" data-line-start="179" data-line-end="180">Then <strong>restart the backend server</strong>:</p>
+<pre><code class="has-line-data language-bash" data-line-start="181" data-line-end="183">uv run uvicorn app.main:app --reload --port 8000
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="184" data-line-end="185"><a id="How_It_Works_Now_184"></a>How It Works Now</h3>
+<ol>
+<li class="has-line-data" data-line-start="185" data-line-end="186">Frontend sends <code>POST /stories/generate</code> with <code>childId</code>, <code>goal</code>, <code>storyMood</code>, <code>storyLength</code>, <code>theme</code>, <code>todayContext</code> — <strong>no <code>provider</code> field needed</strong></li>
+<li class="has-line-data" data-line-start="186" data-line-end="187">Backend reads <code>settings.LLM_PROVIDER</code> from <code>.env</code> (defaults to <code>&quot;mock&quot;</code>)</li>
+<li class="has-line-data" data-line-start="187" data-line-end="188">If <code>LLM_PROVIDER=openrouter</code> and <code>OPENROUTER_API_KEY</code> is set → calls the real OpenRouter API</li>
+<li class="has-line-data" data-line-start="188" data-line-end="190">If <code>LLM_PROVIDER=mock</code> → returns canned mock response (no API key needed)</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="190" data-line-end="191"><a id="Key_Benefit_190"></a>Key Benefit</h3>
+<p class="has-line-data" data-line-start="191" data-line-end="192">Switching between mock and real models is now a <strong>backend-only config change</strong> — no frontend deployment needed.</p>
+<h2 class="code-line has-line-data" data-line-start="193" data-line-end="194"><a id="Real_LLM_Model_Integration_Complete_193"></a>Real LLM Model Integration — Complete</h2>
+<h3 class="code-line has-line-data" data-line-start="195" data-line-end="196"><a id="Verified_Working_195"></a>Verified Working</h3>
+<p class="has-line-data" data-line-start="196" data-line-end="197">The <code>POST /stories/generate</code> endpoint now uses a <strong>real AI model</strong> via OpenRouter:</p>
+<pre><code class="has-line-data" data-line-start="199" data-line-end="207">Provider: openrouter
+Model: google/gemini-3.5-flash
+Title: The Cozy Forest Blanket
+Content: &quot;Pip the little squirrel couldn't sleep because the forest breeze was chilly. His neighbor, Oliver the gentle owl, saw his shivering friend. Oliver fluttered down and shared his big, warm feather blanket with Pip...&quot;
+Token usage: 513 prompt + 1020 completion = 1533 total tokens
+Cost: $0.0099495
+Response time: 6.7 seconds
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="208" data-line-end="209"><a id="Changes_Made_208"></a>Changes Made</h3>
+<p class="has-line-data" data-line-start="210" data-line-end="211"><strong><code>app/core/config.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="211" data-line-end="213">Added <code>LLM_PROVIDER: str = &quot;mock&quot;</code> setting — backend decides which provider to use, not the frontend</li>
+</ul>
+<p class="has-line-data" data-line-start="213" data-line-end="214"><strong><code>app/services/stories.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="214" data-line-end="215">Added <code>from app.core.config import settings</code> import</li>
+<li class="has-line-data" data-line-start="215" data-line-end="217">Changed <code>body.provider</code> → <code>settings.LLM_PROVIDER</code> in the LLM call (lines 179, 186)</li>
+</ul>
+<p class="has-line-data" data-line-start="217" data-line-end="218"><strong><code>.env</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="218" data-line-end="219">Set <code>LLM_PROVIDER=openrouter</code></li>
+<li class="has-line-data" data-line-start="219" data-line-end="221">Set <code>LLM_DEFAULT_MODEL=google/gemini-3.5-flash</code></li>
+</ul>
+<p class="has-line-data" data-line-start="221" data-line-end="222"><strong><code>.env.example</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="222" data-line-end="224">Added <code>LLM_PROVIDER=mock</code> with documentation comments</li>
+</ul>
+<p class="has-line-data" data-line-start="224" data-line-end="225"><strong><code>app/utils/observability.py</code></strong> (from earlier)</p>
+<ul>
+<li class="has-line-data" data-line-start="225" data-line-end="227">Added request body capture and logging for all requests including 422 failures</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="227" data-line-end="228"><a id="How_It_Works_227"></a>How It Works</h3>
+<ol>
+<li class="has-line-data" data-line-start="228" data-line-end="229">Frontend sends <code>POST /stories/generate</code> with <code>childId</code>, <code>goal</code>, <code>storyMood</code>, <code>storyLength</code>, <code>theme</code> — <strong>no provider field needed</strong></li>
+<li class="has-line-data" data-line-start="229" data-line-end="230">Backend reads <code>settings.LLM_PROVIDER</code> from <code>.env</code> (currently <code>openrouter</code>)</li>
+<li class="has-line-data" data-line-start="230" data-line-end="231">Backend calls OpenRouter API with model <code>google/gemini-3.5-flash</code></li>
+<li class="has-line-data" data-line-start="231" data-line-end="233">Real AI generates a personalized story and returns it</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="233" data-line-end="234"><a id="To_Switch_Back_to_Mock_233"></a>To Switch Back to Mock</h3>
+<p class="has-line-data" data-line-start="234" data-line-end="235">Set in <code>.env</code>:</p>
+<pre><code class="has-line-data language-env" data-line-start="236" data-line-end="238">LLM_PROVIDER=mock
+</code></pre>
+<p class="has-line-data" data-line-start="238" data-line-end="239">Then restart the server. No frontend changes needed.</p>
+<h3 class="code-line has-line-data" data-line-start="240" data-line-end="241"><a id="To_Use_a_Different_Model_240"></a>To Use a Different Model</h3>
+<p class="has-line-data" data-line-start="241" data-line-end="242">Set in <code>.env</code>:</p>
+<pre><code class="has-line-data language-env" data-line-start="243" data-line-end="246">LLM_PROVIDER=openrouter
+LLM_DEFAULT_MODEL=google/gemini-3.5-flash  # or any valid OpenRouter model
+</code></pre>
+<p class="has-line-data" data-line-start="246" data-line-end="247">Available models can be found at: <code>https://openrouter.ai/api/v1/models</code></p>
+<h2 class="code-line has-line-data" data-line-start="248" data-line-end="249"><a id="Real_LLM_Model_Working_248"></a>Real LLM Model — Working</h2>
+<h3 class="code-line has-line-data" data-line-start="250" data-line-end="251"><a id="Verified_Result_250"></a>Verified Result</h3>
+<pre><code class="has-line-data" data-line-start="252" data-line-end="260">Provider: openrouter
+Model: google/gemini-3.5-flash-lite
+Title: The Glowing Tree Hug
+Content: 632 chars (~100 words)
+Tokens: 554 prompt + 138 completion = 692 total
+Cost: $0.0005
+Response time: 1.6 seconds
+</code></pre>
+<p class="has-line-data" data-line-start="261" data-line-end="262">The story is a complete, well-formed children’s story about friendship in a forest setting — exactly what was requested.</p>
+<h3 class="code-line has-line-data" data-line-start="263" data-line-end="264"><a id="All_Changes_Made_263"></a>All Changes Made</h3>
+<p class="has-line-data" data-line-start="265" data-line-end="266"><strong><code>app/core/config.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="266" data-line-end="268">Added <code>LLM_PROVIDER: str = &quot;mock&quot;</code> — backend decides provider, not frontend</li>
+</ul>
+<p class="has-line-data" data-line-start="268" data-line-end="269"><strong><code>app/services/stories.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="269" data-line-end="271">Uses <code>settings.LLM_PROVIDER</code> instead of <code>body.provider</code></li>
+</ul>
+<p class="has-line-data" data-line-start="271" data-line-end="272"><strong><code>app/schemas/story.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="272" data-line-end="273"><code>max_tokens</code> increased from 1024 → 2048 (within OpenRouter credit budget)</li>
+<li class="has-line-data" data-line-start="273" data-line-end="275"><code>temperature</code> adjusted to 0.8</li>
+</ul>
+<p class="has-line-data" data-line-start="275" data-line-end="276"><strong><code>app/prompts/stories/generate.txt</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="276" data-line-end="278">Added explicit instructions: “do NOT stop early, write the COMPLETE story” and “Be a fully developed story, not a summary or outline”</li>
+</ul>
+<p class="has-line-data" data-line-start="278" data-line-end="279"><strong><code>.env</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="279" data-line-end="280"><code>LLM_PROVIDER=openrouter</code></li>
+<li class="has-line-data" data-line-start="280" data-line-end="282"><code>LLM_DEFAULT_MODEL=google/gemini-3.5-flash-lite</code> (cheaper than gemini-3.5-flash, avoids 402 credit error)</li>
+</ul>
+<p class="has-line-data" data-line-start="282" data-line-end="283"><strong><code>app/utils/observability.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="283" data-line-end="285">Captures and logs request body for all requests including 422 failures</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="285" data-line-end="286"><a id="How_to_Switch_Models_285"></a>How to Switch Models</h3>
+<p class="has-line-data" data-line-start="286" data-line-end="287">Edit <code>.env</code> and restart the server:</p>
+<pre><code class="has-line-data language-env" data-line-start="288" data-line-end="299"># Mock (no API key needed):
+LLM_PROVIDER=mock
+
+# Real model (current):
+LLM_PROVIDER=openrouter
+LLM_DEFAULT_MODEL=google/gemini-3.5-flash-lite
+
+# Other available models (within credit budget):
+LLM_DEFAULT_MODEL=google/gemini-3.1-flash-lite
+LLM_DEFAULT_MODEL=google/gemini-3.6-flash
+</code></pre>
+<p class="has-line-data" data-line-start="299" data-line-end="300">Then: <code>lsof -ti:8000 | xargs kill -9; rm -f .llm_cache/responses.json; uv run uvicorn app.main:app --port 8000</code></p>
+<h2 class="code-line has-line-data" data-line-start="301" data-line-end="302"><a id="Where_Stories_Are_Stored_in_the_Backend_301"></a>Where Stories Are Stored in the Backend</h2>
+<p class="has-line-data" data-line-start="303" data-line-end="304">Stories are stored in the <strong>PostgreSQL database</strong> in the <code>stories</code> table.</p>
+<h3 class="code-line has-line-data" data-line-start="305" data-line-end="306"><a id="Database_Details_305"></a>Database Details</h3>
+<ul>
+<li class="has-line-data" data-line-start="306" data-line-end="307"><strong>Database</strong>: PostgreSQL (<code>toiage</code> database)</li>
+<li class="has-line-data" data-line-start="307" data-line-end="308"><strong>Connection string</strong>: <code>postgresql+psycopg://postgres:postgres@localhost:5432/toiage</code></li>
+<li class="has-line-data" data-line-start="308" data-line-end="309"><strong>Table</strong>: <code>stories</code></li>
+<li class="has-line-data" data-line-start="309" data-line-end="311"><strong>ORM</strong>: SQLModel (SQLAlchemy-based)</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="311" data-line-end="312"><a id="Table_Schema_stories_311"></a>Table Schema (<code>stories</code>)</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id</code></td>
+<td>int (PK)</td>
+<td>Auto-incremented unique ID</td>
+</tr>
+<tr>
+<td><code>title</code></td>
+<td>str</td>
+<td>Generated story title (e.g. “The Glowing Tree Hug”)</td>
+</tr>
+<tr>
+<td><code>content</code></td>
+<td>str</td>
+<td>Full story text (nullable=False)</td>
+</tr>
+<tr>
+<td><code>goal</code></td>
+<td>str</td>
+<td>Learning goal (e.g. “friendship”)</td>
+</tr>
+<tr>
+<td><code>story_mood</code></td>
+<td>str</td>
+<td>Story mood (e.g. “bedtime”)</td>
+</tr>
+<tr>
+<td><code>story_length</code></td>
+<td>str</td>
+<td>Story length (e.g. “short”)</td>
+</tr>
+<tr>
+<td><code>theme</code></td>
+<td>str</td>
+<td>Story theme/setting (e.g. “forest”)</td>
+</tr>
+<tr>
+<td><code>today_context</code></td>
+<td>str</td>
+<td>Optional context about child’s day</td>
+</tr>
+<tr>
+<td><code>age_group</code></td>
+<td>str</td>
+<td>Legacy field</td>
+</tr>
+<tr>
+<td><code>skills</code></td>
+<td>str</td>
+<td>Legacy field</td>
+</tr>
+<tr>
+<td><code>difficulty</code></td>
+<td>str</td>
+<td>Legacy field</td>
+</tr>
+<tr>
+<td><code>created_at</code></td>
+<td>datetime</td>
+<td>When story was created</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="327" data-line-end="328"><a id="Storage_Flow_327"></a>Storage Flow</h3>
+<ol>
+<li class="has-line-data" data-line-start="328" data-line-end="329">Parent clicks “Generate Story” in the UI</li>
+<li class="has-line-data" data-line-start="329" data-line-end="330">Frontend sends <code>POST /stories/generate</code> with <code>childId</code>, <code>goal</code>, <code>storyMood</code>, <code>storyLength</code>, <code>theme</code></li>
+<li class="has-line-data" data-line-start="330" data-line-end="331">Backend (<code>app/services/stories.py</code>) calls the LLM (OpenRouter → <code>google/gemini-3.5-flash-lite</code>)</li>
+<li class="has-line-data" data-line-start="331" data-line-end="332">LLM returns the story text</li>
+<li class="has-line-data" data-line-start="332" data-line-end="333">Backend parses title + content from the LLM response</li>
+<li class="has-line-data" data-line-start="333" data-line-end="334">Backend saves the story to the <code>stories</code> table via SQLModel: <code>session.add(story) → session.commit()</code></li>
+<li class="has-line-data" data-line-start="334" data-line-end="335">Story is persisted in PostgreSQL with an auto-generated <code>id</code> and <code>created_at</code> timestamp</li>
+<li class="has-line-data" data-line-start="335" data-line-end="337">API returns the saved story (with <code>id</code>, <code>title</code>, <code>content</code>, <code>provider</code>, <code>model</code>) to the frontend</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="337" data-line-end="338"><a id="Model_File_337"></a>Model File</h3>
+<p class="has-line-data" data-line-start="338" data-line-end="339"><code>app/models/story.py</code> — SQLModel ORM class that maps to the <code>stories</code> table</p>
+<h3 class="code-line has-line-data" data-line-start="340" data-line-end="341"><a id="Migration_File_340"></a>Migration File</h3>
+<p class="has-line-data" data-line-start="341" data-line-end="342"><code>alembic/versions/e45d157ca814_create_stories_table.py</code> — Alembic migration that created the <code>stories</code> table</p>
+<h3 class="code-line has-line-data" data-line-start="343" data-line-end="344"><a id="To_Query_Stories_343"></a>To Query Stories</h3>
+<pre><code class="has-line-data language-bash" data-line-start="345" data-line-end="347">psql -U postgres -d toiage -c <span class="hljs-string">&quot;SELECT id, title, goal, theme, created_at FROM stories ORDER BY created_at DESC LIMIT 10;&quot;</span>
+</code></pre>
+<h2 class="code-line has-line-data" data-line-start="348" data-line-end="349"><a id="Story_Storage_Flow_How_It_Works_348"></a>Story Storage Flow — How It Works</h2>
+<p class="has-line-data" data-line-start="350" data-line-end="351">You’re right — there are 40 stories in the DB. Here’s exactly what happens on every <code>POST /stories/generate</code> call:</p>
+<h3 class="code-line has-line-data" data-line-start="352" data-line-end="353"><a id="The_Flow_Both_Mock_LLM_Modes_352"></a>The Flow (Both Mock &amp; LLM Modes)</h3>
+<pre><code class="has-line-data" data-line-start="355" data-line-end="369">Frontend POST /stories/generate
+        ↓
+Backend calls LLM (mock OR openrouter)
+        ↓
+LLM returns story text
+        ↓
+Backend parses title + content
+        ↓
+Backend SAVES to DB  ← session.add(story) + session.commit()
+        ↓
+Backend returns the SAVED DB row (with id, created_at)
+        ↓
+Frontend receives story
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="370" data-line-end="371"><a id="Key_Point_370"></a>Key Point</h3>
+<p class="has-line-data" data-line-start="371" data-line-end="372"><strong>The story is ALWAYS returned from the DB row, not directly from the LLM.</strong></p>
+<p class="has-line-data" data-line-start="373" data-line-end="374">Even though the <em>content</em> comes from the LLM (mock = static, openrouter = real AI), the backend <strong>persists it to the <code>stories</code> table first</strong>, then returns the saved row. That’s why every call creates a <strong>new DB record</strong> — 40 calls = 40 rows.</p>
+<h3 class="code-line has-line-data" data-line-start="375" data-line-end="376"><a id="Code_Path_appservicesstoriespy_lines_211224_375"></a>Code Path (<code>app/services/stories.py</code> lines 211-224)</h3>
+<pre><code class="has-line-data language-python" data-line-start="377" data-line-end="391"><span class="hljs-comment"># 6 — persist</span>
+story = Story(
+    title=title,
+    content=content,
+    goal=body.goal,
+    story_mood=body.story_mood,
+    story_length=body.story_length,
+    theme=body.theme,
+    today_context=body.today_context,
+)
+session.add(story)      <span class="hljs-comment"># ← adds to DB</span>
+session.commit()        <span class="hljs-comment"># ← saves to DB</span>
+session.refresh(story)  <span class="hljs-comment"># ← gets id + created_at</span>
+</code></pre>
+<p class="has-line-data" data-line-start="392" data-line-end="393">Then the API returns <code>story.id</code>, <code>story.title</code>, <code>story.content</code>, <code>story.created_at</code> — all from the <strong>saved DB row</strong>.</p>
+<h3 class="code-line has-line-data" data-line-start="394" data-line-end="395"><a id="Why_So_Many_Stories_394"></a>Why So Many Stories?</h3>
+<p class="has-line-data" data-line-start="395" data-line-end="396">Every generate call = 1 new row. There’s no deduplication or retrieval — each call is treated as a new story generation event. The DB grows by 1 row per call.</p>
+<h3 class="code-line has-line-data" data-line-start="397" data-line-end="398"><a id="Do_You_Want_to_Change_This_397"></a>Do You Want to Change This?</h3>
+<p class="has-line-data" data-line-start="398" data-line-end="399">Options:</p>
+<ol>
+<li class="has-line-data" data-line-start="399" data-line-end="400"><strong>Keep as-is</strong> — every generation is a new story record (current behavior, good for history/analytics)</li>
+<li class="has-line-data" data-line-start="400" data-line-end="401"><strong>Don’t persist</strong> — return the LLM response directly without saving to DB (good for “preview before saving”)</li>
+<li class="has-line-data" data-line-start="401" data-line-end="402"><strong>Add a GET endpoint</strong> — <code>GET /stories</code> to list/retrieve saved stories (so the DB is useful)</li>
+<li class="has-line-data" data-line-start="402" data-line-end="404"><strong>Add cleanup</strong> — delete old stories or limit how many are stored</li>
+</ol>
+<p class="has-line-data" data-line-start="404" data-line-end="405">Which approach do you prefer?</p>
+<h2 class="code-line has-line-data" data-line-start="406" data-line-end="407"><a id="db_Provider_Mode_Fetch_From_Database_Instead_of_LLM_406"></a>“db” Provider Mode — Fetch From Database Instead of LLM</h2>
+<h3 class="code-line has-line-data" data-line-start="408" data-line-end="409"><a id="Verified_Working_408"></a>Verified Working</h3>
+<pre><code class="has-line-data" data-line-start="410" data-line-end="416">Provider: db
+Model: db-fetch
+Title: The Glowing Tree Hug
+Content: 632 chars
+Response time: 44ms (vs 1.6s for LLM — 37x faster, $0 API cost)
+</code></pre>
+<p class="has-line-data" data-line-start="417" data-line-end="418">The log confirms: <code>&quot;Story fetched from database (db mode — no LLM call)&quot;</code> — it found a matching story in the DB and returned it <strong>without calling the LLM</strong>.</p>
+<h3 class="code-line has-line-data" data-line-start="419" data-line-end="420"><a id="How_It_Works_419"></a>How It Works</h3>
+<p class="has-line-data" data-line-start="421" data-line-end="422">When <code>LLM_PROVIDER=db</code> in <code>.env</code>:</p>
+<pre><code class="has-line-data" data-line-start="424" data-line-end="439">POST /stories/generate
+      ↓
+Backend checks: provider == &quot;db&quot;?
+      ↓ Yes
+Query DB for matching story:
+  WHERE goal = &quot;friendship&quot;
+    AND theme = &quot;forest&quot;
+    AND story_mood = &quot;bedtime&quot; (if provided)
+    AND story_length = &quot;short&quot; (if provided)
+  ORDER BY created_at DESC LIMIT 1
+      ↓
+Found? → Return existing story (no LLM call, no new DB row)
+      ↓ No
+Fall back to LLM_PROVIDER (openrouter/mock) → call LLM → save new row
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="440" data-line-end="441"><a id="Three_Provider_Modes_Now_Available_440"></a>Three Provider Modes Now Available</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th><code>LLM_PROVIDER</code></th>
+<th>What Happens</th>
+<th>API Cost</th>
+<th>Speed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mock</code></td>
+<td>Returns static canned response</td>
+<td>Free</td>
+<td>~0ms</td>
+</tr>
+<tr>
+<td><code>openrouter</code></td>
+<td>Calls real AI (google/gemini-3.5-flash-lite)</td>
+<td>~$0.0005/call</td>
+<td>~1.6s</td>
+</tr>
+<tr>
+<td><strong><code>db</code></strong></td>
+<td><strong>Fetches existing story from database</strong></td>
+<td><strong>Free</strong></td>
+<td><strong>~44ms</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="448" data-line-end="449"><a id="Changes_Made_448"></a>Changes Made</h3>
+<p class="has-line-data" data-line-start="450" data-line-end="451"><strong><code>app/services/stories.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="451" data-line-end="452">Added “db” provider mode: when <code>LLM_PROVIDER=db</code>, queries the <code>stories</code> table for a matching story (by <code>goal</code>, <code>theme</code>, <code>story_mood</code>, <code>story_length</code>) before calling the LLM</li>
+<li class="has-line-data" data-line-start="452" data-line-end="453">If a match is found → returns the existing story (no LLM call, no new DB row)</li>
+<li class="has-line-data" data-line-start="453" data-line-end="455">If no match → falls back to the configured LLM provider</li>
+</ul>
+<p class="has-line-data" data-line-start="455" data-line-end="456"><strong><code>app/core/config.py</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="456" data-line-end="458">Added <code>LLM_PROVIDER: str = &quot;mock&quot;</code> setting</li>
+</ul>
+<p class="has-line-data" data-line-start="458" data-line-end="459"><strong><code>.env</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="459" data-line-end="461">Currently set to <code>LLM_PROVIDER=db</code> (fetch from DB mode)</li>
+</ul>
+<p class="has-line-data" data-line-start="461" data-line-end="462"><strong><code>.env.example</code></strong></p>
+<ul>
+<li class="has-line-data" data-line-start="462" data-line-end="464">Documented all three modes: <code>mock</code>, <code>openrouter</code>, <code>db</code></li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="464" data-line-end="465"><a id="To_Switch_Modes_464"></a>To Switch Modes</h3>
+<p class="has-line-data" data-line-start="465" data-line-end="466">Edit <code>.env</code> and restart:</p>
+<pre><code class="has-line-data language-env" data-line-start="467" data-line-end="477"># Free, fast, no API cost — reuse existing stories:
+LLM_PROVIDER=db
+
+# Free, static canned response:
+LLM_PROVIDER=mock
+
+# Real AI model (costs ~$0.0005/call):
+LLM_PROVIDER=openrouter
+LLM_DEFAULT_MODEL=google/gemini-3.5-flash-lite
+</code></pre>
+<p class="has-line-data" data-line-start="477" data-line-end="478">Then: <code>lsof -ti:8000 | xargs kill -9; rm -f .llm_cache/responses.json; uv run uvicorn app.main:app --port 8000</code></p>
+
+</body>
+</html>

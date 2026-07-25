@@ -15,6 +15,9 @@ from app.schemas.story import (
 )
 from app.services.analytics import EVENT_STORY_GENERATED, analytics
 from app.services.stories import generate_story
+from app.utils.logger import get_logger
+
+logger = get_logger("app.api.stories")
 
 router = APIRouter(prefix="/stories", tags=["stories"])
 
@@ -43,15 +46,40 @@ async def generate_story_endpoint(
     session: Session = Depends(get_session),
 ):
     """Generate a personalized story via the LLM and save it."""
+    # ── Log incoming request payload ──
+    logger.info(
+        "Story generation request received",
+        extra={
+            "endpoint": "POST /stories/generate",
+            "request_payload": body.model_dump(by_alias=True),
+            "child_id": body.child_id,
+            "provider": body.provider,
+            "goal": body.goal,
+            "story_mood": body.story_mood,
+            "story_length": body.story_length,
+            "theme": body.theme,
+            "temperature": body.temperature,
+            "max_tokens": body.max_tokens,
+        },
+    )
+
     try:
         story = await generate_story(body, session)
     except PromptNotFoundError as e:
+        logger.error(
+            "Story generation failed — prompt template not found",
+            extra={"endpoint": "POST /stories/generate", "error": str(e)},
+        )
         raise HTTPException(status_code=404, detail=str(e))
     except ValueError as e:
+        logger.error(
+            "Story generation failed — invalid request",
+            extra={"endpoint": "POST /stories/generate", "error": str(e)},
+        )
         raise HTTPException(status_code=400, detail=str(e))
 
     # Build response from the saved row + transient LLM provenance
-    return StoryGenerateResponse(
+    response = StoryGenerateResponse(
         id=story.id,
         title=story.title,
         content=story.content,
@@ -60,10 +88,27 @@ async def generate_story_endpoint(
         story_length=story.story_length,
         theme=story.theme,
         today_context=story.today_context,
+        language=getattr(story, "language", "en"),
         created_at=story.created_at,
         provider=getattr(story, "_provider", body.provider),
         model=getattr(story, "_model", "unknown"),
     )
+
+    # ── Log final response payload ──
+    logger.info(
+        "Story generation response sent",
+        extra={
+            "endpoint": "POST /stories/generate",
+            "story_id": response.id,
+            "provider": response.provider,
+            "model": response.model,
+            "title": response.title,
+            "content_length": len(response.content) if response.content else 0,
+            "content_preview": (response.content[:200] + "...") if response.content and len(response.content) > 200 else response.content,
+        },
+    )
+
+    return response
 
 
 @router.post(

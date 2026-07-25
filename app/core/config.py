@@ -18,9 +18,13 @@ class Settings(BaseSettings):
     # Default serves at http://localhost:8000/toiage-core/
     API_PREFIX: str = "/toiage-core"
     DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/toiage"
+    # LLM provider selection — backend decides, not frontend.
+    # Set to "openrouter" (or "deepseek", "openai", "gemini", "ollama") for real model.
+    # Defaults to "mock" (no API key needed).
+    LLM_PROVIDER: str = "mock"
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
-    LLM_DEFAULT_MODEL: str = "google/gemini-2.0-flash-001"
+    LLM_DEFAULT_MODEL: str = "google/gemini-3.5-flash-lite"
     LLM_TIMEOUT_SECONDS: int = 30
     UPLOAD_DIR: str = str(Path(__file__).resolve().parent.parent.parent / "uploads")
     MAX_UPLOAD_SIZE_MB: int = 10
