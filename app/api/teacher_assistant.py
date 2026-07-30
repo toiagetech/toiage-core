@@ -1,4 +1,13 @@
-"""Teacher Assistant API endpoints — generate educational assessments from teacher-specified patterns."""
+"""Teacher Assistant API endpoints — generate educational assessments.
+
+This is the business orchestration layer. It:
+1. Saves/finds the assessment pattern
+2. Calls the education engine via HTTP to generate the assessment
+3. Saves the generation history
+4. Returns the response
+
+It never calls LLM providers directly.
+"""
 
 import json
 
@@ -13,7 +22,10 @@ from app.schemas.assessment import (
     GenerateAssessmentRequest,
     GenerateAssessmentResponse,
 )
-from app.services.teacher_assistant import teacher_assistant_service
+from app.services.education_engine import generate_assessment as engine_generate_assessment
+from app.utils.logger import get_logger
+
+logger = get_logger("app.api.teacher_assistant")
 
 router = APIRouter(prefix="/api/v1/teacher-assistant", tags=["teacher-assistant"])
 
@@ -27,7 +39,10 @@ router = APIRouter(prefix="/api/v1/teacher-assistant", tags=["teacher-assistant"
         "Generate a CBSE-aligned assessment where the teacher specifies question types, counts, and marks per question. "
         "The pattern is auto-saved for reuse. Supports any question types: mcq, short_answer, long_answer, fill_blanks, true_false, match, etc."
     ),
-    responses={400: {"description": "Invalid request"}},
+    responses={
+        400: {"description": "Invalid request"},
+        502: {"description": "Education engine unavailable"},
+    },
 )
 async def generate_assessment(
     body: GenerateAssessmentRequest,
@@ -39,7 +54,7 @@ async def generate_assessment(
 
         # --- Step 1: Save or find existing pattern ---
         pattern_name = body.pattern_name or f"Class {body.grade} {body.subject} - {body.topic or body.chapter}"
-        
+
         existing = session.exec(
             select(AssessmentConfig).where(
                 AssessmentConfig.grade == body.grade,
@@ -71,8 +86,22 @@ async def generate_assessment(
             session.refresh(pattern)
             pattern_id = pattern.id
 
-        # --- Step 2: Generate questions via LLM ---
-        result = await teacher_assistant_service.generate(body)
+        # --- Step 2: Build payload and call the education engine ---
+        payload = {
+            "grade": body.grade,
+            "subject": body.subject,
+            "chapter": body.chapter,
+            "topic": body.topic,
+            "difficulty": body.difficulty,
+            "question_specs": [s.model_dump() for s in body.question_specs],
+            "provider": body.provider,
+        }
+
+        try:
+            result = await engine_generate_assessment(payload)
+        except Exception as e:
+            logger.error("Assessment generation failed — education engine error", extra={"error": str(e)})
+            raise HTTPException(status_code=502, detail=f"Education engine error: {str(e)}")
 
         # --- Step 3: Save generation history ---
         history = AssessmentGenerationHistory(
@@ -82,7 +111,7 @@ async def generate_assessment(
             chapter=body.chapter,
             topic=body.topic,
             question_specs=json.dumps([s.model_dump() for s in body.question_specs]),
-            generated_output=json.dumps([s.model_dump() for s in result.sections], default=str),
+            generated_output=json.dumps(result.get("sections", []), default=str),
             total_marks=total_marks,
             provider=body.provider,
         )
@@ -92,14 +121,14 @@ async def generate_assessment(
 
         # --- Step 4: Return response with IDs ---
         return GenerateAssessmentResponse(
-            subject=result.subject,
-            grade=result.grade,
-            chapter=result.chapter,
-            topic=result.topic,
+            subject=result.get("subject", body.subject),
+            grade=result.get("grade", body.grade),
+            chapter=result.get("chapter", body.chapter),
+            topic=result.get("topic", body.topic),
             total_marks=total_marks,
-            sections=result.sections,
-            total_time_minutes=result.total_time_minutes,
-            instructions=result.instructions,
+            sections=result.get("sections", []),
+            total_time_minutes=result.get("total_time_minutes", ""),
+            instructions=result.get("instructions", []),
             id=history.id,
             pattern_id=pattern_id,
             pattern_name=pattern_name,
@@ -149,7 +178,6 @@ async def get_generation(history_id: int, session: Session = Depends(get_session
     if not record:
         raise HTTPException(status_code=404, detail="Generation not found")
 
-    import json
     try:
         sections = json.loads(record.generated_output) if record.generated_output else []
     except (json.JSONDecodeError, Exception):
