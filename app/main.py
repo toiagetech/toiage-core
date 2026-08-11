@@ -6,11 +6,16 @@ from sqlmodel import text
 
 from app.api.activities import router as activities_router
 from app.api.children import router as children_router
+from app.api.content_journey import router as content_journey_router
+from app.api.development_records import router as development_records_router
+from app.api.insights import router as insights_router
 from app.api.parents import router as parents_router
-from app.api.stories import router as stories_router
-from app.api.uploads import router as uploads_router
+from app.api.questionnaires import router as questionnaires_router
 from app.api.science_projects import router as science_projects_router
+from app.api.signals import router as signals_router
+from app.api.stories import router as stories_router
 from app.api.teacher_assistant import router as teacher_assistant_router
+from app.api.uploads import router as uploads_router
 from app.api.prototype_management import router as prototype_router
 from app.core.config import settings
 from app.db.session import engine
@@ -63,6 +68,11 @@ app.include_router(uploads_router)
 app.include_router(science_projects_router)
 app.include_router(teacher_assistant_router)
 app.include_router(prototype_router)
+app.include_router(questionnaires_router)
+app.include_router(development_records_router)
+app.include_router(signals_router)
+app.include_router(insights_router)
+app.include_router(content_journey_router)
 
 # Mount uploads directory for serving uploaded files
 uploads_path = Path(settings.UPLOAD_DIR)

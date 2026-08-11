@@ -9,6 +9,11 @@ from app.models.assessment_pattern import AssessmentConfig
 from app.models.project_record import ScienceProjectRecord
 from app.models.generation_history import AssessmentGenerationHistory
 from app.models.prototype_master import PrototypeMaster
+from app.models.questionnaire import QuestionnaireTemplate, QuestionnaireResponse
+from app.models.development_record import ChildDevelopmentRecord
+from app.models.signal import Signal
+from app.models.insight import ChildInsight
+from app.models.content_journey import ContentJourney
 
 __all__ = [
     "Activity",
@@ -22,4 +27,11 @@ __all__ = [
     "ScienceProjectRecord",
     "AssessmentGenerationHistory",
     "PrototypeMaster",
+    "QuestionnaireTemplate",
+    "QuestionnaireResponse",
+    "ChildDevelopmentRecord",
+    "Signal",
+    "ChildInsight",
+    "ContentJourney",
 ]
+
