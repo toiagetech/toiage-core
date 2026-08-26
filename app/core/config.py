@@ -25,8 +25,11 @@ class Settings(BaseSettings):
     POSTHOG_HOST: str = "https://us.i.posthog.com"
 
     # Education Engine
-    EDUCATION_ENGINE_URL: str = "http://localhost:8001"
+    EDUCATION_ENGINE_URL: str = "http://localhost:8000"
     EDUCATION_ENGINE_ENABLED: bool = True
+    # "v1" = legacy per-type endpoints (/api/v1/generate/story etc., unchanged);
+    # "v2" = unified endpoint (/api/v2/generate with a `type` discriminator).
+    EDUCATION_ENGINE_API_VERSION: str = "v1"
 
     # Security
     CORS_ALLOWED_ORIGINS: list[str] = ["*"]

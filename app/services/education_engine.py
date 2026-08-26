@@ -24,12 +24,44 @@ def _base_url() -> str:
     return settings.EDUCATION_ENGINE_URL.rstrip("/")
 
 
+def _api_version() -> str:
+    return getattr(settings, "EDUCATION_ENGINE_API_VERSION", "v1").lower()
+
+
 async def _post_json(url: str, payload: dict, timeout: float) -> dict:
     """POST JSON to the education engine and return the response."""
     async with httpx.AsyncClient(timeout=timeout) as client:
         resp = await client.post(url, json=payload)
         resp.raise_for_status()
         return resp.json()
+
+
+async def _generate(content_type: str, payload: dict, timeout: float) -> dict:
+    """Generate via the engine, transparently supporting v1 and v2.
+
+    v2 (/api/v2/generate) returns a shared core + a typed block named after
+    the content type. This helper flattens that block back into the same flat
+    shape the v1 endpoints return, so all callers stay unchanged regardless
+    of which API version is configured.
+    """
+    if _api_version() == "v2":
+        url = f"{_base_url()}/api/v2/generate"
+        body = dict(payload)
+        body.pop("type", None)
+        body["type"] = content_type
+        result = await _post_json(url, body, timeout)
+        typed = result.pop(content_type, None)
+        if isinstance(typed, dict):
+            # Typed block wins; core fields (provider/model/language/status) fill gaps.
+            flat = {**result, **typed}
+        else:
+            flat = {**result, **{k: v for k, v in (typed or {}).items()}}
+        # Normalize id field name across versions.
+        flat.setdefault("guidance_id", result.get("generate_id"))
+        return flat
+
+    # v1 — legacy per-type endpoints
+    return await _post_json(f"{_base_url()}/api/v1/generate/{content_type}", payload, timeout)
 
 
 # ─── Context fetching (existing, kept for backward compat) ──────────
@@ -231,9 +263,8 @@ async def generate_story(payload: dict, session: Session | None = None) -> dict:
         return dict(_MOCK_STORY)
 
     # Default: call education engine
-    url = f"{_base_url()}/api/v1/generate/story"
     try:
-        result = await _post_json(url, payload, _GENERATE_TIMEOUT)
+        result = await _generate("story", payload, _GENERATE_TIMEOUT)
         logger.info(
             "Story generated via education engine",
             extra={"provider": result.get("provider"), "model": result.get("model"), "language": result.get("language")},
@@ -263,9 +294,8 @@ async def generate_activity(payload: dict, session: Session | None = None) -> di
         logger.info("Activity generation — db mode (fallback to static)")
         return dict(_MOCK_ACTIVITY)
 
-    url = f"{_base_url()}/api/v1/generate/activity"
     try:
-        result = await _post_json(url, payload, _GENERATE_TIMEOUT)
+        result = await _generate("activity", payload, _GENERATE_TIMEOUT)
         logger.info(
             "Activity generated via education engine",
             extra={"provider": result.get("provider"), "model": result.get("model")},
@@ -295,9 +325,8 @@ async def generate_reflection(payload: dict, session: Session | None = None) -> 
         logger.info("Reflection generation — db mode (fallback to static)")
         return dict(_MOCK_REFLECTION)
 
-    url = f"{_base_url()}/api/v1/generate/reflection"
     try:
-        result = await _post_json(url, payload, _GENERATE_TIMEOUT)
+        result = await _generate("reflection", payload, _GENERATE_TIMEOUT)
         logger.info(
             "Reflection generated via education engine",
             extra={"provider": result.get("provider"), "model": result.get("model")},
@@ -359,9 +388,8 @@ async def generate_assessment(payload: dict, session: Session | None = None) -> 
         logger.info("Assessment generation — db mode (fallback to static)")
         return dict(_MOCK_ASSESSMENT)
 
-    url = f"{_base_url()}/api/v1/generate/assessment"
     try:
-        result = await _post_json(url, payload, _GENERATE_TIMEOUT)
+        result = await _generate("assessment", payload, _GENERATE_TIMEOUT)
         logger.info(
             "Assessment generated via education engine",
             extra={"grade": result.get("grade"), "subject": result.get("subject"), "provider": result.get("provider")},
@@ -372,6 +400,48 @@ async def generate_assessment(payload: dict, session: Session | None = None) -> 
         raise
     except Exception as e:
         logger.error("Failed to call education engine for assessment generation", extra={"error": str(e)})
+        raise
+
+
+async def generate_guidance(payload: dict, session: Session | None = None) -> dict:
+    """Generate parent-friendly guidance via the education engine.
+
+    Runs the shared Knowledge Agent → Wisdom Agent → Guidance Service → LLM
+    flow, with metadata-aware RAG retrieval (age-band + domain filtered).
+
+    Payload: question (required), child_profile {name, age}, language, provider.
+    Returns flat dict: guidance, resources[], suggested_next[], parent_tips[],
+    question, normalized_intent/topic, provider, model.
+    """
+    if _is_static_mode():
+        logger.info("Guidance generation — using static mock response")
+        return {
+            "guidance_id": "static-guidance",
+            "status": "COMPLETED",
+            "question": payload.get("question", ""),
+            "guidance": "Static guidance response.",
+            "resources": [],
+            "suggested_next": [],
+            "parent_tips": [],
+            "provider": "mock",
+        }
+
+    try:
+        result = await _generate("guidance", payload, _GENERATE_TIMEOUT)
+        logger.info(
+            "Guidance generated via education engine",
+            extra={
+                "provider": result.get("provider"),
+                "model": result.get("model"),
+                "resources": len(result.get("resources") or []),
+            },
+        )
+        return result
+    except httpx.HTTPStatusError as e:
+        logger.error("Education engine returned error for guidance generation", extra={"status": e.response.status_code, "detail": e.response.text[:200]})
+        raise
+    except Exception as e:
+        logger.error("Failed to call education engine for guidance generation", extra={"error": str(e)})
         raise
 
 
